@@ -10,7 +10,7 @@ fontsize: 12 pt
 
 <!-- By the end of the day 11/12/21, please submit a copy of the pdf of the paper your group will be using for the final project to the _project-assignmnet1_ dropbox. Additionally, please submit a single document for your group that addresses the following:  -->
 
-__1. A brief description of the background motivation of your chosen article and a _single_ research question you will choose to investigate that was presented in the paper. Note that your article may address more than 1 questton but I want you to focus on just 1 for this project.__
+__1. A brief description of the background motivation of your chosen article and a _single_ research question you will choose to investigate that was presented in the paper. Note that your article may address more than 1 question but I want you to focus on just 1 for this project.__
 
 
 
@@ -21,5 +21,17 @@ __2. A brief description of the methods used by the authors of your paper to add
 
 __3. The full probability model used in the paper written out in mathematical notation. That is, all likelihood and prior components.__
 
+
+# Introduction 
+
+The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Additionally, individuals born earlier in the year may be more likely to persevere in sports since they are able to actively dominate in physical activities and key performance measures. This suggests that as time goes on, those who are less mature drop out of sports as they are not as successful, motivated, or fulfilled by the experience in their younger years of competition, contributing further to their underperformance.
+
+In the paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model*, Hideaki Ishigami explores the effect sizes of the relative age and birthplace of becoming a professional athlete for two of the most popular sports in Japan, soccer and baseball. Previous studies suggest that where an athlete was born and developed is another important factor for determining the likelihood of becoming an elite athlete. In Japan, for example, "northern areas may receive, on average, over 100 snow days per year, whereas in the southern areas there are few to no snow days" [@RAE]. As soccer and baseball are not typically played in snow, an athlete's birthplace may have an effect on their athletic development.  
+
+
+# Code Appendix
+
+
+# References
 
 
