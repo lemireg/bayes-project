@@ -16,11 +16,34 @@ __1. A brief description of the background motivation of your chosen article and
 
 __2. A brief description of the methods used by the authors of your paper to address the question of interest you are focusing on.__
 
+### Data
 
+The participants in the original study were professional baseball and soccer players, but we will focus only on professional soccer. The Japan Professional Football League (J. League) consists of 40 teams, representing a total of 1013 players registered in the 2012 season and we will focus on players between the ages of 23 and 25, for a total of 227. 
+
+The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Birth date was treated as monthly data and because school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March).
+
+An athlete's birthplace is defined as the prefecture the player was born in. A prefecture is a first-order administrative district in Japan, and there are 47 prefectures in total.
+
+The author's model includes the total number of male children born in each month as an offset term, which is a variable whose coefficient is fixed at one. The variable in the estimated equation is the total number of male births over the years when the sampled players were born.
+
+### Methods
+
+Becoming a soccer player can be seen as an “event”, and a number of them can be regarded as
+a “count of events”. Thus, the author applied a Bayesian hierarchical Poisson regression model.
 
 
 __3. The full probability model used in the paper written out in mathematical notation. That is, all likelihood and prior components.__
 
+$$y_{ij} \sim \text{Poisson}(\lambda_{ij}) \text{   for   } i=1,\dots,12; j= 1, \dots, 47$$
+$$\lambda_{ij} = \theta_{ij}exp \Bigg \{a_j +\beta RA_i \Bigg \}$$
+$y_{ij}$ is the number of professional sports players where subscripts $i,j$ indicate birth month and prefecture, respectively. $\theta_{ij}$ is the total number of male children born in month $i$ in prefecture $j$. The $a_j$ intercept term is meant to capture the differences in the likelihoods between birthplaces. 
+
+$RA_i$ is the relative age of those born in month $i$, while the coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the probability of becoming a professional soccer player. 
+
+The authors found the posterior estimate for $\beta$ to be $\beta \sim \text{Normal}(-0.0934, 0.214^2)$ which we will use as our prior. 
+
+We did not see an updated posterior for $a_j$ so we assume the prior in the paper where 
+$a_j \sim \text{Normal}(\mu_a, \sigma^2_a)$ where $\u_a \sim \text{Normal}(0,100^2)$ and $\sigma^2_a \sim \text{Uniform}(0,100)$. 
 
 # Introduction 
 
