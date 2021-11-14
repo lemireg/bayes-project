@@ -12,7 +12,11 @@ fontsize: 12 pt
 
 __1. A brief description of the background motivation of your chosen article and a _single_ research question you will choose to investigate that was presented in the paper. Note that your article may address more than 1 question but I want you to focus on just 1 for this project.__
 
+__Chosen Paper:__ Our chosen paper is *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* by Hideaki Ishigami (published in the Journal of Sports Sciences in 2016).
 
+__Background Motivation:__ Much research has been done to look at the relative age effect in athletes in North America and Europe. However this paper (and our analysis) extends this research to include Asian countries. This is an important step in geographically extending the scope of inference regarding the relative age effect. This has impacts on parents' decisions surrounding red shirting and informs public understanding of factors influencing success in athletics (particularly professional athletics). 
+
+__Single Research Question:__ What is the relative age effect on soccer players in Japan between the ages of 23 and 25?
 
 __2. A brief description of the methods used by the authors of your paper to address the question of interest you are focusing on.__
 
@@ -43,13 +47,13 @@ $RA_i$ is the relative age of those born in month $i$, while the coefficient $\b
 The authors found the posterior estimate for $\beta$ to be $\beta \sim \text{Normal}(-0.0934, 0.214^2)$ which we will use as our prior. 
 
 We did not see an updated posterior for $a_j$ so we assume the prior in the paper where 
-$a_j \sim \text{Normal}(\mu_a, \sigma^2_a)$ where $\u_a \sim \text{Normal}(0,100^2)$ and $\sigma^2_a \sim \text{Uniform}(0,100)$. 
+$a_j \sim \text{Normal}(\mu_a, \sigma^2_a)$ where $\mu_a \sim \text{Normal}(0,100^2)$ and $\sigma^2_a \sim \text{Uniform}(0,100)$. 
 
 # Introduction 
 
 The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Additionally, individuals born earlier in the year may be more likely to persevere in sports since they are able to actively dominate in physical activities and key performance measures. This suggests that as time goes on, those who are less mature drop out of sports as they are not as successful, motivated, or fulfilled by the experience in their younger years of competition, contributing further to their underperformance.
 
-In the paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model*, Hideaki Ishigami explores the effect sizes of the relative age and birthplace of becoming a professional athlete for two of the most popular sports in Japan, soccer and baseball. Previous studies suggest that where an athlete was born and developed is another important factor for determining the likelihood of becoming an elite athlete. In Japan, for example, "northern areas may receive, on average, over 100 snow days per year, whereas in the southern areas there are few to no snow days" [@RAE]. As soccer and baseball are not typically played in snow, an athlete's birthplace may have an effect on their athletic development.  
+In the paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model*, Hideaki Ishigami explores the effect sizes of the relative age and birthplace of becoming a professional athlete for two of the most popular sports in Japan, soccer and baseball. Previous studies suggest that where an athlete was born and developed is another important factor for determining the likelihood of becoming an elite athlete. In Japan, for example, "northern areas may receive, on average, over 100 snow days per year, whereas in the southern areas there are few to no snow days" [@RAE]. As soccer and baseball are not typically played in snow, an athlete's birthplace may have an effect on their athletic development.
 
 
 # Code Appendix
