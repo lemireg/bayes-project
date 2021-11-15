@@ -36,9 +36,9 @@ The author's model includes the total number of male children born in each month
 
 ### Methods
 
-Becoming a soccer player can be seen as an “event”, and a number of them can be regarded as
-a “count of events”. Thus, the author applied a Bayesian hierarchical Poisson regression model.
+Becoming a soccer player can be seen as an “event”, and a number of them can be regarded as a “count of events”. Thus, the author applied a Bayesian hierarchical Poisson regression model.
 
+ <!-- Should we include more here? I don't know what else we would say, but it seems like we could have more to say here -->
 
 __3. The full probability model used in the paper written out in mathematical notation. That is, all likelihood and prior components.__
 
@@ -49,17 +49,17 @@ $$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
   <!-- note: If we're only doing soccer I think we only need i, because j is location (for population and weather) and k is for sport... whops nevermind. i'm going back in our convo and seeing that we decided we'll include all three covariates.... we can always change later I'm sure - if we need to -->
   
 ### Priors
-__need to add stuff about offset term i.e. theta and priors are for alpha and beta__
+__need to add stuff about priors are for alpha and beta__
+__Here we have 'priors' and below we have 'prior'__
 
-Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of male children born in month $i$ with an intercept term $\alpha$. $RA_i$ is the relative age of those born in month $i$, while the coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the probability of becoming a professional soccer player.
+Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of men born over the years during the sample in month $i$, an offset term to make the months comparable since some months have different numbers of births. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the probability of becoming a professional male soccer player.
 
 $$\lambda_{i} = \theta_{i}exp \Bigg \{\alpha +\beta RA_i \Bigg \}$$
 
 ### Prior
 The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.214^2)$ which we will use as our prior.
 
-We did not see an updated posterior for $\alpha$ so we assume the prior in the paper where 
-$\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$. 
+We did not see an updated posterior for $\alpha$ so we assume the prior in the paper, $\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$. 
 
 __Question for Katie:__ We are confused by the posteriors being on (what seems like) hyperparameters. Are these two "layers" of hyperparameters because our initial model was a two layer hierarchical model? (i.e. random effects varying by month, $i$, and random effects varying by location, $j$, which we excluded). The "two layers" we're seeing are: hyperparameters $\alpha$ and $\beta$ and (hyper)-hyperparameters $\mu$ and $\sigma^2$. Can you help clarify? 
 
