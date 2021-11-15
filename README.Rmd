@@ -15,7 +15,3 @@ By the end of the day 11/12/21, please submit a copy of the pdf of the paper you
 2. A brief description of the methods used by the authors of your paper to address the question of interest you are focusing on. 
 
 3. The full probability model used in the paper written out in mathematical notation. That is, all likelihood and prior components. 
-
-## Gabby's Questions
-
-- in the intro they mention they are trying to "decompose the variation in the likelihood between birthplace into pop size and weather conditions".... this makes it sound like their distribution of interest isn't the posterior but the likelihood. or maybe that's just a way of saying this is how they are structuring their hierarchical model?
