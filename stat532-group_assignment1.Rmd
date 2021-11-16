@@ -30,9 +30,9 @@ The participants in the original study were professional baseball and soccer pla
 
 The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Birth date was treated as monthly data and because school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March).
 
-An athlete's birthplace is defined as the prefecture the player was born in. A prefecture is a first-order administrative district in Japan, and there are 47 prefectures in total.
+An athlete's birthplace is defined as the prefecture the player was born in. A prefecture is a first-order administrative district in Japan, and there are 47 prefectures in total. We are going to ignore prefecture random effects for now, but the original author included them in his model. 
 
-The author's model includes the total number of male children born in each month as an offset term, which is a variable whose coefficient is fixed at one. The variable in the estimated equation is the total number of male births over the years when the sampled players were born.
+The author's model includes the total number of male children born in each month as an offset term. The variable in the estimated equation is the total number of male births over the years when the sampled players were born, which effectively turns the number of professional players into a rate or proportion for each month, and allows us to more reasonably compare the months to one another even if they have different birth rates.
 
 ### Methods
 
@@ -49,15 +49,11 @@ $$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
   <!-- note: If we're only doing soccer I think we only need i, because j is location (for population and weather) and k is for sport... whops nevermind. i'm going back in our convo and seeing that we decided we'll include all three covariates.... we can always change later I'm sure - if we need to -->
   
 ### Priors
-__need to add stuff about priors are for alpha and beta__
-__Here we have 'priors' and below we have 'prior'__
 
-Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of men born over the years during the sample in month $i$, an offset term to make the months comparable since some months have different numbers of births. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the probability of becoming a professional male soccer player.
+Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of men born over the years during the sample in month $i$. $\theta_i$ is an offset term to make the months comparable since some months have different numbers of births. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the probability of becoming a professional male soccer player.
 
 $$\lambda_{i} = \theta_{i}exp \Bigg \{\alpha +\beta RA_i \Bigg \}$$
-
-### Prior
-The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.214^2)$ which we will use as our prior.
+The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.0214^2)$ which we will use as our prior.
 
 We did not see an updated posterior for $\alpha$ so we assume the prior in the paper, $\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$. 
 
