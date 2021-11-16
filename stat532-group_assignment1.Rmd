@@ -66,7 +66,10 @@ __Question for Katie:__ We are confused by the posteriors being on (what seems l
 <!-- In the paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model*, Hideaki Ishigami explores the effect sizes of the relative age and birthplace of becoming a professional athlete for two of the most popular sports in Japan, soccer and baseball. Previous studies suggest that where an athlete was born and developed is another important factor for determining the likelihood of becoming an elite athlete. In Japan, for example, "northern areas may receive, on average, over 100 snow days per year, whereas in the southern areas there are few to no snow days" [@RAE]. As soccer and baseball are not typically played in snow, an athlete's birthplace may have an effect on their athletic development. -->
 
 
-<!-- # Code Appendix -->
+<!-- # Code Appendix 
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```   
+-->
 
 
 <!-- # References -->
