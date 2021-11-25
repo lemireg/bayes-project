@@ -1,0 +1,41 @@
+---
+title: "Stat532 - Group Assignment (part 2, questions listed in Assign 8)"
+author: "Demorest, Lemire and Wilson"
+date: "11/25/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Group component 
+
+__1. Use your project article to answer the following questions.__
+
+__a. Briefly explain what computational methods were used by the authors of your group's chosen article to summarize or approximate the posterior distributions of interest. If it is not something we have covered in class yet, is it discussed elsewhere in the text book?__
+
+The authors ran the MCMC algorithm for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in ( _note: this seems quite high?_ ). Only every 100 iteration was saved for a total of 1,000 MCMC samples. JAGS was used for computing the posterior (Plummer, 2012). Result consistency was confirmed with Stan (Stan Development Team, 2013).
+
+<!-- can add to answer -->
+
+__b. Briefly explain what methods the authors used to check convergence of the computational algorithms they used to approximate the posterior distribution.__
+
+The authors used the Gelman-Rubin statistic (Gelman & Rubin, 1992) and the Geweke’s convergence diagnostic (Geweke, 1992) to check the convergence of the MCMC algorithms.
+
+<!-- can add to answer -->
+
+
+
+<!-- __from labelled p147/page 6 of PDF in paper:__ _"We ran the Markov chain Monte Carlo (MCMC) algorithm for 25,000 iterations for five chains. After the first 5000 samples were discarded as burn-in, samples were saved every 100 iterations to obtain 1000 MCMC samples. Posterior computations were run using JAGS (Plummer, 2012) from R (R Development Core Team, 2013). We also sampled the posterior distribution by using Stan (Stan Development Team, 2013) and confirmed that the results were consistent. The convergence of the MCMC algorithms was then checked by using the Gelman–Rubin statistic (Gelman & Rubin, 1992) and the Geweke’s convergence diagnostic (Geweke, 1992)."_ -->
+
+## References
+
+Gelman, A., & Rubin, D. (1992). _Inference from iterative simulation using multiple sequences._ Statistical Sciences, 7, 457–472.
+
+Geweke, J. (1992). _Evaluating the accuracy of sampling-based approaches to calculating posterior moments._ In J. Berdardo, J. Berger, A. David, & A. Smith (Eds.), Bayesian statistics 4. Oxford: Claredon Press.
+
+Plummer, M. (2012). _Just another Gibbs sampler (ver. 3.4.0)._ Retrieved from http://mcmc-jags.sourceforge.net/
+
+Stan Development Team. (2013). _Stan: A C++ library for probability and sampling (ver. 1.3.0)._ Retrieved from http://mc-stan.org/
+    
