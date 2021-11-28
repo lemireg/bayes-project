@@ -15,13 +15,15 @@ __1. Use your project article to answer the following questions.__
 
 __a. Briefly explain what computational methods were used by the authors of your group's chosen article to summarize or approximate the posterior distributions of interest. If it is not something we have covered in class yet, is it discussed elsewhere in the text book?__
 
-The authors ran the MCMC algorithm for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in ( _note: this seems quite high?_ ). Only every 100 iteration was saved for a total of 1,000 MCMC samples. JAGS was used for computing the posterior (Plummer, 2012). Result consistency was confirmed with Stan (Stan Development Team, 2013).
+The authors considered becoming a professional sports player as an event and a number of them can be regarded as count of events. A poisson regression model was used to analyze this count data which made it possible to estimate the magnitude of the effects of several factors influencing the likelihood of playing a sport professionally. 
+
+The authors ran a MCMC algorithm for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in ( _note: this seems quite high?_ ). Only every 100 iteration was saved for a total of 1,000 MCMC samples. Although no code is presented in the paper, JAGS was used for computing the posterior (Plummer, 2012) and result consistency was confirmed with Stan (Stan Development Team, 2013).
 
 <!-- can add to answer -->
 
 __b. Briefly explain what methods the authors used to check convergence of the computational algorithms they used to approximate the posterior distribution.__
 
-The authors used the Gelman-Rubin statistic (Gelman & Rubin, 1992) and the Geweke’s convergence diagnostic (Geweke, 1992) to check the convergence of the MCMC algorithms.
+The authors used the Gelman-Rubin statistic (Gelman & Rubin, 1992), $\hat{R}$, which assess convergence by comparing the estimated between-chains and within-chain variances for each model parameter. Additionally, the authors used the Geweke’s convergence diagnostic (Geweke, 1992) to check the convergence of the MCMC algorithms. The Geweke convergence diagnostic is a test for equality of the means of the first and last part of a Markov chain, typically the first 10% and the last 50%. If the samples are drawn from a stationary distribution of the chain, then the two means are equal and Geweke's statistic has a standard normal distribution. The test statistic is a standard Z-score: the difference between the two sample means divided by its estimated standard error. The standard error is estimated from the spectral density at zero, and so takes into account any autocorrelation and the Z-score is calculated under the assumption that the two parts of the chain are asymptotically independent. Both of these tests are available in the `coda` package in R. 
 
 <!-- can add to answer -->
 
