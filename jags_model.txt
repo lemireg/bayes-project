@@ -5,5 +5,5 @@ model{
       lambda[i] <- births[i]*exp(RA[i]*beta)
       }     
     ## Priors 
-    beta ~ dnorm(a0,b0)  # multivariate Normal prior
+    beta ~ dnorm(a0,b0)
 }
