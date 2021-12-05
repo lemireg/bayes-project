@@ -65,6 +65,9 @@ Katie's comment about this:
 Given our likelihood and prior our full model can be expressed as follows:
 
 $$P(\lambda_i|\vec{y}) \propto \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!} \times \theta_{i}e^{(\alpha +\beta RA_i)}$$
+
+Look into whether our posterior is Gamma, and if this is even our posterior of interest: https://stats.stackexchange.com/questions/26199/how-do-i-calculate-a-posterior-distribution-for-a-poisson-model-with-exponential
+
 __Show visual of prior and likelihood with our chosen alpha and beta hyperparams__
 
 ## Data Simulation Using Model
@@ -146,8 +149,10 @@ generate plots with posterior predictive dist and have our data on it too?
 <!-- Your opinion of the data analysis presented in the paper and what you learned (5/100 points) -->
 <!-- Thoughtful and complete critique and reflection of the paper chosen -->
 Can keep notes of our thoughts/critiques as we go along so it's easier to write this section at the end:
+
 - it was good they included the offset term (he notes in the paper "the assumption that the distribution of the number of births is uniform across the months of the year is clearly invalid" p146)
-- didn't like that he didn't include data when he said where he got it - 
+
+- didn't like that he didn't include data when he said where he got it
 <!-- Group work statement & Writing Quality (10/100) -->
 
 ## References
