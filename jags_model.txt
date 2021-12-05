@@ -4,6 +4,8 @@ model{
       y[i] ~ dpois(lambda[i])
       lambda[i] <- births[i]*exp(RA[i]*beta)
       }     
-    ## Priors 
-    beta ~ dnorm(a0,b0)
+    ## Priors
+    mu ~ dnorm(0,100*100)
+    sig ~ dt(0, pow(2.5,-2), 5)T(0,)
+    beta ~ dnorm(mu,sig*sig)
 }
