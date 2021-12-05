@@ -25,22 +25,68 @@ Our simulation and modeling process will mirror the author's study design in whi
 The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Although it is beyond the scope of this paper, these results impact parents' decisions surrounding red shirting and informs public understanding of factors influencing success in athletics (particularly professional athletics).
 
 ## Model 
-
 <!-- Model (10 points/100) -->
 <!-- Random variables and parameters defined in the context of the problem -->
 <!-- Fully specified model, including prior distributions -->
+Our Bayesian model consists of our likelihood which describes the data generating process, an offset term which converts our "counts" into "rates", and a prior. We will go into further detail below on all the components of this model. 
+
+### Data
+Each of our observations is the total number of professional players born in a given month. The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Since school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March). Therefore in total we have 12 observations which sum to our total number of professional players ($\sum_{i=0}^{11}y_i=227$). _Can say more about this dependending on whether we find data and use it or whether we generate - clarify with Katie first._
+
+### Likelihoood
+As previously mentioned becoming a soccer player can be seen as an “event”, and thus a number of them can be regarded as a “count of events”. To capture this data generating process the author used a poisson distribution for the likelihood with an offset term.
+
+#### Poisson Distribution
+Our data are denoted by $y_{i}$ which represents the number of professional sports players between ages 23 and 25 in the year 2012 who are born in a given month (where $\sum_{i=0}^{11}y_i=227$). We have:
+$$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
+Where our likelihood function is:
+$$L(\lambda; y_0, ... y_{11}) = \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!}$$
+And our log-likelihood is:
+$$l(\lambda; y_0, ... y_{11}) = -11\lambda - \sum_{i=0}^{11}ln(y_i!)+ ln(\lambda)\sum_{i=0}^{11}y_i$$
+
+#### Offset Term
+The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true. Thus we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a poisson regression model for counts except we multiply the expected counts by $\theta_i$.
+
+### Priors
+
+Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of men born over the years during the sample in month $i$. $\theta_i$ is an offset term to make the months comparable since some months have different numbers of births. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the rate of becoming a professional male soccer player.
+
+$$\lambda_{i} = \theta_{i}exp \Bigg \{\alpha +\beta RA_i \Bigg \}$$
+The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.0214^2)$ which we will use as our prior.
+
+We did not see an updated posterior for $\alpha$ so we assume the prior in the paper, $\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$.
+
 
 ## References
 <!-- proper notation -->
 
-## Data
+## Data Simulation Using Model
+
+#### Data for $y_i$
+The author did not provide the data for the birth months of the 227 soccer players aged 23-25 in the 2012 season. However he did refer to the Japan Professional Football League (J. League) website which contains these data. We sought out these data on the given website and __insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - Connor__
+
+#### Data for $\theta_i$
+The author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. These are the birth years for 23-25 year old athletes in 2012. We used birth data by country and year provided by United Nations Statistics Division
+<!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 -->
+and the sex ratio for the year 2015 provided by Statista.
+<!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ -->
+__insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - James__
+
+#### Simulated $\alpha_i$ and $\beta_i$
 <!-- Simulation of artificial data (will likely have slightly different and simplified model for this section) (25/100pts) -->
 <!-- Description of simplification to the authors’ model, if necessary -->
 <!-- Data generating process described (i.e., each step of the simulation is clearly explained) -->
+
+
 <!-- Fake data generated and displayed appropriately -->
-to simulate we want: 
-- distribution for monthly birth data in Japan for males born 87-89
-- distribution of birth months for our 227 observations
+__to simulate we want: __
+__- distribution for monthly birth data in Japan for males born 87-89__
+__- distribution of birth months for our 227 observations__
+__or are we simulating alpha & beta__
+__- she mentioned this when looking at paper__
+__- and in her comment on our "assign 1" __
+
+Show a visual of data that we generated
 
 
 ## Results
@@ -88,6 +134,8 @@ generate plots with posterior predictive dist and have our data on it too?
 <!-- Group work statement & Writing Quality (10/100) -->
 
 ## References
+<!-- for poisson likelihood: https://www.statlect.com/fundamentals-of-statistics/Poisson-distribution-maximum-likelihood -->
+<!-- for offset term: https://online.stat.psu.edu/stat504/book/export/html/782 -->
 
 <!-- Gelman, A., & Rubin, D. (1992). _Inference from iterative simulation using multiple sequences._ Statistical Sciences, 7, 457–472. -->
 
