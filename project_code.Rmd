@@ -79,9 +79,15 @@ library(rstan)
 model = stan_model("stan_model.stan")
 # model
 data_stan <- list(I = 12, y = players, births = births, RA = RA)
-fit = stan(file = "stan_model.stan", data = data_stan, chains = 1, iter = 25000)
+fit = stan(file = "stan_model.stan", 
+           data = data_stan, 
+           chains = 5, 
+           iter = 25000, 
+           thin = 100, 
+           warmup = 5000,
+           control = list(adapt_delta = 0.9,
+                          max_treedepth = 15))
 # fit
 stan_trace(fit, pars = c("alpha", "beta")) + 
   labs(title = "Traceplots")
 ```
-
