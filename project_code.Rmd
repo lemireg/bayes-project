@@ -68,3 +68,9 @@ effectiveSize(jags_out)
 gelman.diag(jags_out)
 ```
 
+```{r}
+library(rstan)
+data_stan <- list(I = 12, y = players, RA = RA, births=births)
+
+```
+
