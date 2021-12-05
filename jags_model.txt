@@ -2,9 +2,15 @@ model{
     ## Likelihood
     for(i in 1:length(RA)){
       y[i] ~ dpois(lambda[i])
-      lambda[i] <- births[i]*exp(RA[i]*beta)
+      lambda[i] <- births[i]*exp(alpha + RA[i]*beta)
       }     
     ## Priors
+    #alpha
+    mu_a ~ dnorm(0,100*100)
+    sig_a ~ dunif(0,100)
+    alpha ~ dnorm(mu_a, sig_a*sig_a)
+    
+    #beta
     mu ~ dnorm(0,100*100)
     sig ~ dt(0, pow(2.5,-2), 5)T(0,)
     beta ~ dnorm(mu,sig*sig)

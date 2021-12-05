@@ -50,7 +50,7 @@ data_jags <- list(y = players, RA = RA, births=births)
 #data_jags <- list(y = players, RA = RA, births=births, a0=a0,b0=b0)
 #inits1 <- function() {list(mu = 1.0, tau = 1, m1 = 1.0)}
 
-pars_to_save <- c("beta")
+pars_to_save <- c("alpha","beta")
 
 jags_out_pre <- jags.model("jags_model.txt", 
                            data = data_jags, 
@@ -67,6 +67,8 @@ jags_out <- coda.samples(jags_out_pre, pars_to_save,
 plot(jags_out)
 
 ```
+
+
 ```{r}
 #Convergence
 effectiveSize(jags_out)
