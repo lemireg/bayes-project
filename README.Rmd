@@ -22,7 +22,7 @@ In order to answer the question: what is the RAE on soccer players in Japan betw
 Our simulation and modeling process will mirror the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and since we will focus on players between the ages of 23 and 25, we have 227 observations. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
 <!-- can change these references to be in bib file later -->
 
-The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Although it is beyond the scope of this paper, these results impact parents' decisions surrounding red shirting and informs public understanding of factors influencing success in athletics (particularly professional athletics).
+The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Finally this paper also includes an offset term in our model to capture the differences in birth rates by month which has also often been left out in other analyses. All of these factors make this topic and methodology valuable in the literature on RAE.
 
 ## Model 
 <!-- Model (10 points/100) -->
@@ -48,31 +48,38 @@ $$l(\lambda; y_0, ... y_{11}) = -11\lambda - \sum_{i=0}^{11}ln(y_i!)+ ln(\lambda
 The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true. Thus we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a poisson regression model for counts except we multiply the expected counts by $\theta_i$.
 
 ### Priors
+Our priors on $\lambda_{i}$ are defined by the exponential relationship: $\lambda_{i} = \theta_{i}e^{(\alpha +\beta RA_i)}$. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$ (where $RA_i \epsilon (0,1,...11)$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 0, with $RA_1 = 0$. The exponential term gives the rate of becoming a professional male soccer player for that month.
 
-Our priors on $\lambda_{i}$ are defined by the exponential relationship below where $\theta_{i}$ is the total number of men born over the years during the sample in month $i$. $\theta_i$ is an offset term to make the months comparable since some months have different numbers of births. The intercept term $\alpha$ is a baseline probability of becoming a male professional soccer player after controlling for the relative age effect. $RA_i$ is the relative age of those born in month $i$. The coefficient $\beta$ measures the relative age effect (RAE). For example, April would be month 1, with $RA_1 = 0$. The exponential term gives the rate of becoming a professional male soccer player.
-
-$$\lambda_{i} = \theta_{i}exp \Bigg \{\alpha +\beta RA_i \Bigg \}$$
-The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.0214^2)$ which we will use as our prior.
-
-We did not see an updated posterior for $\alpha$ so we assume the prior in the paper, $\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$.
+#### Hyperparameter $\alpha$
+<!-- We did not see an updated posterior for $\alpha$ so we assume the prior in the paper, $\alpha \sim \text{Normal}(\mu, \sigma^2)$ where $\mu \sim \text{Normal}(0,100^2)$ and $\sigma^2 \sim \text{Uniform}(0,100)$. -->
 
 
-## References
-<!-- proper notation -->
+#### Hyperparameter $\beta$
+<!-- The authors found the posterior estimate for $\beta|y$ to be $\beta|y \sim \text{Normal}(-0.0934, 0.0214^2)$ which we will use as our prior. -->
+
+Katie's comment about this:
+*alpha and beta are partial regression coefficients in your glm that are of interest. I'm wondering if alpha has a subscript on it  (i.e., is it a "random intercept" term?) because then that heterogeneity in the different intercepts gets modeled by assuming htey all come from one population distr that's a normal with mean mu and var sigma2...the mean and sig2 need to also be estimated from the data (similar to the MH wihtin Gibbs logit hierarcical model example). so you put a prior on those hyper parmas. We'll talk more about this and see chapters 5 and 6 in gelman. *
+
+### Full Model
+
+Given our likelihood and prior our full model can be expressed as follows:
+
+$$P(\lambda_i|\vec{y}) \propto \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!} \times \theta_{i}e^{(\alpha +\beta RA_i)}$$
+__Show visual of prior and likelihood with our chosen alpha and beta hyperparams__
 
 ## Data Simulation Using Model
 
-#### Data for $y_i$
+### Data for $y_i$
 The author did not provide the data for the birth months of the 227 soccer players aged 23-25 in the 2012 season. However he did refer to the Japan Professional Football League (J. League) website which contains these data. We sought out these data on the given website and __insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - Connor__
 
-#### Data for $\theta_i$
+### Data for $\theta_i$
 The author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. These are the birth years for 23-25 year old athletes in 2012. We used birth data by country and year provided by United Nations Statistics Division
 <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 -->
 and the sex ratio for the year 2015 provided by Statista.
 <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ -->
 __insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - James__
 
-#### Simulated $\alpha_i$ and $\beta_i$
+### Simulated $\alpha_i$ and $\beta_i$
 <!-- Simulation of artificial data (will likely have slightly different and simplified model for this section) (25/100pts) -->
 <!-- Description of simplification to the authors’ model, if necessary -->
 <!-- Data generating process described (i.e., each step of the simulation is clearly explained) -->
@@ -85,6 +92,13 @@ __- distribution of birth months for our 227 observations__
 __or are we simulating alpha & beta__
 __- she mentioned this when looking at paper__
 __- and in her comment on our "assign 1" __
+__I think it's the latter, but if it's the former what dist do we generate from (not uniform because that's something that separates our model from others).__
+
+__Right now our JAGS code is generating a posterior for Beta but since we are not doing the hierarchical model shouldn't alpha and beta simply be hyperparams that we input and our posterior is for lambda?__
+
+__but isn't beta our param of interest because it's the $RA_i$__
+
+__$RA_i$ is the "relative age of those born in month i" but based on how it is in the model it seems like it should be a categorical variable (or `as.factor()`) i.e. if April is 0 and March is 11... these numeric values are arbitrary.__
 
 Show a visual of data that we generated
 
@@ -131,6 +145,9 @@ generate plots with posterior predictive dist and have our data on it too?
 
 <!-- Your opinion of the data analysis presented in the paper and what you learned (5/100 points) -->
 <!-- Thoughtful and complete critique and reflection of the paper chosen -->
+Can keep notes of our thoughts/critiques as we go along so it's easier to write this section at the end:
+- it was good they included the offset term (he notes in the paper "the assumption that the distribution of the number of births is uniform across the months of the year is clearly invalid" p146)
+- didn't like that he didn't include data when he said where he got it - 
 <!-- Group work statement & Writing Quality (10/100) -->
 
 ## References
