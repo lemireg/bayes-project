@@ -26,7 +26,8 @@ births <- US_births/US_tot*840800*.51
 ```{r}
 library(rjags)
 library(coda)
-set.seed(1126)
+library(extraDistr)
+set.seed(1205)
 
 #Called Jags Model from text file, but code below
 # model{
@@ -36,25 +37,29 @@ set.seed(1126)
 #       lambda[i] <- births[i]*exp(RA[i]*beta)
 #       }     
 #     ## Priors 
+#     mu ~ dnorm(0,100*100)
+#     sig ~ dt(0, pow(2.5,-2), 5)T(0,)
 #     beta ~ dnorm(a0,b0)
 #           
 # }
 
+# a0 <- rnorm(1, mean=0,sd=100)
+# b0 <- rhcauchy(1, sigma = 5)
 
-data_jags <- list(y = players, RA = RA, births=births, a0 = -.0934, b0 = .025)
-
+data_jags <- list(y = players, RA = RA, births=births)
+#data_jags <- list(y = players, RA = RA, births=births, a0=a0,b0=b0)
 #inits1 <- function() {list(mu = 1.0, tau = 1, m1 = 1.0)}
 
 pars_to_save <- c("beta")
 
 jags_out_pre <- jags.model("jags_model.txt", 
                            data = data_jags, 
-                           n.adapt=1000, n.chains = 3)
+                           n.adapt=1000, n.chains = 5)
 ```
 
 ```{r}
 jags_out <- coda.samples(jags_out_pre, pars_to_save,
-                         n.iter = 25000, thin = 1)
+                         n.iter = 25000, thin = 100)
 
 ```
 
@@ -66,6 +71,7 @@ plot(jags_out)
 #Convergence
 effectiveSize(jags_out)
 gelman.diag(jags_out)
+#autocorr.plot(jags_out, lag.max=50)
 ```
 
 ```{r}

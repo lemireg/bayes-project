@@ -1,17 +1,100 @@
 ---
-title: "Final Project, Task 1: Description of paper and model"
-author: "Due 11/12/21, end of the day 11:59pm"
-
-output:
-  pdf_document: default
-  html_document: default
-fontsize: 12 pt
+title: "Relative Age Effect in Japanese Professional Soccer"
+author: "Demorest, Lemire and Wilson"
+date: "12/5/2021"
+bibliography: 532bayesproject.bib
+nocite: '@*'
+output: pdf_document
 ---
 
-By the end of the day 11/12/21, please submit a copy of the pdf of the paper your group will be using for the final project to the _project-assignmnet1_ dropbox. Additionally, please submit a single document for your group that addresses the following: 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-1. A brief description of the background motivation of your chosen article and a _single_ research question you will choose to investigate that was presented in the paper. Note that your article may address more than 1 questton but I want you to focus on just 1 for this project. 
+## Introduction
 
-2. A brief description of the methods used by the authors of your paper to address the question of interest you are focusing on. 
+<!-- Introduction (10 points/100) -->
+<!-- clear description of background information -->
+The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Much research has been done to look at RAE in North American and European athletes. However very little research has attempted to extend findings surrounding RAE to other parts of the world, specifically Asia. This is why we are interested in Hideaki Ishigami's work in the paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* (published in the Journal of Sports Sciences in 2016). In our paper we will replicate Ishigami's modelling process using simulated data. <!-- research question(s) clearly state -->
+In order to answer the question: what is the RAE on soccer players in Japan between the ages of 23 and 25 in the 2012 season?
 
-3. The full probability model used in the paper written out in mathematical notation. That is, all likelihood and prior components. 
+<!-- study design described -->
+Our simulation and modeling process will mirror the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and since we will focus on players between the ages of 23 and 25, we have 227 observations. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
+<!-- can change these references to be in bib file later -->
+
+The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Although it is beyond the scope of this paper, these results impact parents' decisions surrounding red shirting and informs public understanding of factors influencing success in athletics (particularly professional athletics).
+
+## Model 
+
+<!-- Model (10 points/100) -->
+<!-- Random variables and parameters defined in the context of the problem -->
+<!-- Fully specified model, including prior distributions -->
+
+## References
+<!-- proper notation -->
+
+## Data
+<!-- Simulation of artificial data (will likely have slightly different and simplified model for this section) (25/100pts) -->
+<!-- Description of simplification to the authors’ model, if necessary -->
+<!-- Data generating process described (i.e., each step of the simulation is clearly explained) -->
+<!-- Fake data generated and displayed appropriately -->
+to simulate we want: 
+- distribution for monthly birth data in Japan for males born 87-89
+- distribution of birth months for our 227 observations
+
+
+## Results
+
+<!-- Model fitting and results (25/100 points) -->
+<!-- Successful implementation of the model or description of how to do so in JAGS, Stan, or by writing customized sampler. -->
+#### Implementing Bayesian Model using JAGS
+<!-- Discussion of mcmc diagnostics, or how to do so if samples from posterior could not be obtained. -->
+*can include code snippets and describe our implementation*
+
+<!-- Visualization and interpretation of results -->
+#### Bayesian Model
+*include visual for Density of Beta*
+`plot(jags_out)[2]`
+
+#### Assessing Convergence 
+`plot(jags_out)[1]` 
+
+with $\hat{R}$
+The authors used the Gelman-Rubin statistic (Gelman & Rubin, 1992), $\hat{R}$, which assesses convergence by comparing the estimated between-chains and within-chain variances for each model parameter. Our results for 
+<!-- list our results for R-hat -->
+
+#### Assessing Convergence with Geweke’s Diagnostic
+Additionally, the authors used the Geweke’s convergence diagnostic (Geweke, 1992) to check the convergence of the MCMC algorithms. The Geweke convergence diagnostic is a test for equality of the means of the first and last part of a Markov chain, typically the first 10% and the last 50%. If the samples are drawn from a stationary distribution of the chain, then the two means are equal and Geweke's statistic has a standard normal distribution. The test statistic is a standard Z-score: the difference between the two sample means divided by its estimated standard error. The standard error is estimated from the spectral density at zero, and so takes into account any autocorrelation and the Z-score is calculated under the assumption that the two parts of the chain are asymptotically independent. Both of these tests are available in the `coda` package in \textsf{R}. 
+<!-- list our results for Geweke -->
+
+<!-- Summary of inference in the context of the research question with limitations related to model assumptions and scope of inference addressed -->
+
+### Posterior Predictive Checks
+
+<!-- thoughtful discussion of relevant posterior predictive checks for the problem at hand -->
+
+
+<!-- Posterior predictive checks/model assessment (10/100 points) -->
+#### Assessing Posterior Fit to Our Data
+generate plots with posterior predictive dist and have our data on it too?
+
+#### Other ideas for PPCs?
+
+
+## Conclusion
+
+<!-- Your opinion of the data analysis presented in the paper and what you learned (5/100 points) -->
+<!-- Thoughtful and complete critique and reflection of the paper chosen -->
+<!-- Group work statement & Writing Quality (10/100) -->
+
+## References
+
+<!-- Gelman, A., & Rubin, D. (1992). _Inference from iterative simulation using multiple sequences._ Statistical Sciences, 7, 457–472. -->
+
+<!-- Geweke, J. (1992). _Evaluating the accuracy of sampling-based approaches to calculating posterior moments._ In J. Berdardo, J. Berger, A. David, & A. Smith (Eds.), Bayesian statistics 4. Oxford: Claredon Press. -->
+
+<!-- Plummer, M. (2012). _Just another Gibbs sampler (ver. 3.4.0)._ Retrieved from http://mcmc-jags.sourceforge.net/ -->
+
+<!-- Stan Development Team. (2013). _Stan: A C++ library for probability and sampling (ver. 1.3.0)._ Retrieved from http://mc-stan.org/ -->
+
+<!-- this is where the bib file will auto-generate a bibliography -->
