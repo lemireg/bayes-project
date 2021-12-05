@@ -70,7 +70,12 @@ gelman.diag(jags_out)
 
 ```{r}
 library(rstan)
-data_stan <- list(I = 12, y = players, RA = RA, births=births)
-
+model = stan_model("stan_model.stan")
+# model
+data_stan <- list(I = 12, y = players, births = births, RA = RA)
+fit = stan(file = "stan_model.stan", data = data_stan, chains = 1, iter = 25000)
+# fit
+stan_trace(fit, pars = c("alpha", "beta")) + 
+  labs(title = "Traceplots")
 ```
 
