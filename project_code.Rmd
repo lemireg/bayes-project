@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(dplyr)
 months <- c("April","May","June",
             "July","August","September", 
             "October", "November", "December",
@@ -16,11 +17,27 @@ players <- c(35,28,30,32,27,23,25,20,21,15,12,10)
 
 RA <- c(0,1,2,3,4,5,6,7,8,9,10,11)
 
-US_tot <- 4265555
-US_births <- c(329809,355437,358251,367934,387798,374711,367354,351832,356111,340297,319235,356786)
-birth_rate <- US_births/US_tot
+# US_tot <- 4265555
+# US_births <- c(329809,355437,358251,367934,387798,374711,367354,351832,356111,340297,319235,356786)
+# birth_rate <- US_births/US_tot
+# 
+# births <- US_births/US_tot*840800*.51
+# #48.8% men
 
-births <- US_births/US_tot*840800*.51
+#Read in Japan Data from CSV
+japan_births <- read.csv("UNdata_Export_20211205_201842295.csv")
+#Aggregate by month
+agg_births <- aggregate(japan_births$Value, by=list(Category=japan_births$Month), FUN=sum)
+colnames(agg_births) <- c("Month","Births")
+
+#Find total males born 
+agg_births$Births <- agg_births$Births *0.488
+#Arrange April to March
+agg_births <- agg_births %>% arrange(factor(Month, levels = months))
+agg_births <- head(agg_births,-2)
+
+#
+births <- agg_births$Births
 ```
 
 ```{r}
@@ -50,7 +67,7 @@ data_jags <- list(y = players, RA = RA, births=births)
 #data_jags <- list(y = players, RA = RA, births=births, a0=a0,b0=b0)
 #inits1 <- function() {list(mu = 1.0, tau = 1, m1 = 1.0)}
 
-pars_to_save <- c("beta")
+pars_to_save <- c("alpha","beta")
 
 jags_out_pre <- jags.model("jags_model.txt", 
                            data = data_jags, 
@@ -59,20 +76,52 @@ jags_out_pre <- jags.model("jags_model.txt",
 
 ```{r}
 jags_out <- coda.samples(jags_out_pre, pars_to_save,
-                         n.iter = 25000, thin = 100)
+                         n.iter = 25000, thin = 1)
 
 ```
 
 ```{r}
 plot(jags_out)
-
 ```
+
+
 ```{r}
 #Convergence
 effectiveSize(jags_out)
 gelman.diag(jags_out)
 #autocorr.plot(jags_out, lag.max=50)
 ```
+
+```{r}
+idx_samp_jags <- sample(1:25000, size = 1000, rep = F)
+all_samps_jags <- do.call(rbind, jags_out)
+plot_samps_jags <- data.frame(all_samps_jags[idx_samp_jags, ])
+
+sim_lambda <- vector(length=length(RA))
+for (i in 1:length(RA)){
+   alpha <- sample(plot_samps_jags$alpha, size=1)
+   beta <- sample(plot_samps_jags$beta, size=1)
+   sim_lambda[i] <- births[i]*exp(alpha+beta*RA[i])
+}
+
+sim_players <-vector(length=length(RA))
+
+for (i in 1:length(RA)){
+  sim_players[i] <- rpois(1, sim_lambda[i])
+}
+# plot_samps_jags$mu <- plot_samps_jags$phi1
+# plot_samps_jags$sigma <- exp(plot_samps_jags$phi2)
+# plot_samps_jags$m1 <- exp(plot_samps_jags$phi3)
+
+# 
+# par(mfrow=c(2,2))
+# hist(plot_samps_jags$mu, xlab=expression(mu), main="")
+# hist(plot_samps_jags$sig, xlab=expression(sigma), main="")
+# hist(plot_samps_jags$m1, xlab="m1", main="")
+
+```
+
+
 
 ```{r}
 library(rstan)
