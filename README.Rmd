@@ -90,11 +90,17 @@ __insert result of search here and what our data are possibly in a code snippet 
 
 <!-- Fake data generated and displayed appropriately -->
 __to simulate we want: __
+
 __- distribution for monthly birth data in Japan for males born 87-89__
+
 __- distribution of birth months for our 227 observations__
+
 __or are we simulating alpha & beta__
+
 __- she mentioned this when looking at paper__
+
 __- and in her comment on our "assign 1" __
+
 __I think it's the latter, but if it's the former what dist do we generate from (not uniform because that's something that separates our model from others).__
 
 __Right now our JAGS code is generating a posterior for Beta but since we are not doing the hierarchical model shouldn't alpha and beta simply be hyperparams that we input and our posterior is for lambda?__
