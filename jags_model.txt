@@ -14,4 +14,9 @@ model{
     mu ~ dnorm(0,100*100)
     sig ~ dt(0, pow(2.5,-2), 5)T(0,)
     beta ~ dnorm(mu,sig*sig)
+    
+    #Posterior Predict Players
+    for(i in 1:12) {
+      y_ppd[i] ~ dpois(lambda[i])
+    }
 }

@@ -1,0 +1,393 @@
+---
+title: "Project_Draft_2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Much research has been done to look at RAE in North American and European athletes. However very little research has attempted to extend findings surrounding RAE to other parts of the world, specifically Asia. In this paper, we attempt to replicate the work done in Hideaki Ishigami's paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* (published in the Journal of Sports Sciences in 2016). In our paper we simplify Ishigami's modelling process using simulated data. <!-- research question(s) clearly state -->
+In order to answer the question: what is the RAE on soccer players in Japan between the ages of 23 and 25 in the 2012 season?
+
+Our simulation and modeling process will simplify the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and since we will focus on players between the ages of 23 and 25, we have 227 observations. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
+
+The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Finally this paper also includes an offset term in our model to capture the differences in birth rates by month which has also often been left out in other analyses. All of these factors make this topic and methodology valuable in the literature on RAE. 
+
+In this paper we are interested in the magnitude of the RAE effect sizes between months, and in particular, the disadvantage for each month as compared to April and relative risk between each month and March. Disadvantage evaluates the extent to which children have a relative disadvantage across months. For example, if the disadvantage is measured at 10% between two months, then the chance of becoming a professional athlete for a child born one month later will be 90% of that born in the previous month. Relative risk on the other hand, is the ratio of the probabilities of becoming a professional athlete. The larger the relative risk, the greater the advantage children born earlier have over children born later in the year in terms of becoming a professional athlete. 
+
+## Model
+
+The author used a Bayesian hierarchical Poisson model to estimate the effects of becoming a professional athlete where, 
+$$y_{ijk} \sim \text{Poisson}(\lambda_{ijk}), \text{   for   } i=1,\dots,12; j=1\dots,47; k=1,2;$$
+$$\lambda_{ijk} = \theta_{ij}\text{exp}\Big(\alpha_j + \beta_kRA_i +\gamma\text{Weather}_j + \delta_1\text{Pop}_j + \delta_2\text{Pop}^2 + \epsilon_i +\eta I[k=1]\Big)$$
+In this model, $y_{ijk}$ is the number of professional players, and subscripts $i,j$ and $k$ indicate birth month, prefecture, and sport. $\theta_{ij}$ represents the total number of male children born in month $i$ in prefecture $j$. The intercept term, $\alpha_j$, aims to capture the differences in the likelihoods between the birthplaces that remains after controlling for the two factors of population size and weather conditions. $RA_i$ is the relative age of those born in month $i$ and the coefficients on $\beta_k$, measure the relative age effect. In this paper, we simplify this model by removing the hierarchical component, prefecture, and measure only the RAE between months for J. League soccer players. 
+
+Each of our observations is the total number of professional J. League players born in a given month. The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Since school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March). Our data are denoted by $y_{i}$, which represents the number of professional sports players between ages 23 and 25 in the year 2012 who are born in a given month. Our simplified model is therefore 
+$$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
+Where our likelihood function is:
+$$L(\lambda; y_0, ... y_{11}) = \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!}$$
+And our log-likelihood is:
+$$l(\lambda; y_0, ... y_{11}) = -11\lambda - \sum_{i=0}^{11}ln(y_i!)+ ln(\lambda)\sum_{i=0}^{11}y_i$$
+
+## ADD PRIOR INFO HERE
+
+
+The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true and we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a poisson regression model for counts except we multiply the expected counts by $\theta_i$.
+
+For an initial model to simulate data from, we used the 227 professional soccer players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. These are the birth years for 23-25 year old athletes in 2012. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between log(players) and RA. As shown in Figure 1, this linearity assumption seems reasonable.  
+
+```{r echo =F, message=F, ref.label= "initial_data"}
+
+```
+
+```{r echo =F, message=F, ref.label= "initial_linearity", fig.cap="log(players) vs RA"}
+
+```
+
+Using this data, we fit our model from which to simulate professional players per month. As reported in Table 2, the simulated players for each month seem reasonable, although July is a bit larger than the original data. The lineariy between log(sim players) and RA also seems reasonable, but not that the simulated data appears more disperse. 
+
+```{r echo =F, message=F, ref.label= "sim_players", fig.cap="Simulated Data"}
+```
+
+```{r echo =F, message=F, ref.label= "linearity_sim_players", fig.cap="Simulated log(players) vs RA"}
+
+```
+
+
+Using this simulated player data for $y_i$, we ran a our model in JAGS with 5 chains, each with 25,000 iterations. Figures 3 and 4 show the trace plots for $\alpha$, $\beta$, and $\lambda_i$. The chains appear to be mixing well and do not see any issues. 
+
+```{r echo =F, message=F, ref.label= "trace_alpha_beta", fig.cap="Trace Plots for Alpha and Beta Coefficients"}
+
+```
+
+```{r echo =F, message=F, ref.label= "trace_plots_lambda", fig.cap="Trace Plots for Lambda"}
+
+```
+
+
+
+As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnostics reported in Table 3. We obtain $\hat{R}$'s of approximately 1 for all parameters, suggesting convergence and see healthy $n_{eff}$ for each parameter. We did note large $n_{neff}$ on prior hyperparameters greater than the number of iterations performed, which we found odd but were unable to make sense of. **elaborate**
+
+
+```{r echo =F, message=F, ref.label= "post_burn_samps"}
+
+```
+
+
+In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to make sure that our model can accurately capture the simulated data. We noted an unusual simulated data point for July, but it appears that the model realistically capture these features in the data and there is no need for modification. 
+
+```{r echo =F, message=F, ref.label= "post_predict", fig.cap="Posterior Prediction for Players per month", fig.height=6, fig.width=8}
+
+```
+
+
+
+```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and Relative Risk by Month", fig.height=6, fig.width=8}
+
+```
+
+
+
+\newpage
+
+# Code Appendix
+
+```{r initial_data, eval=FALSE, message=FALSE}
+library(pander)
+library(dplyr)
+months <- c("April","May","June",
+            "July","August","September", 
+            "October", "November", "December",
+            "January", "February", "March")
+players <- c(35,28,30,32,27,23,25,20,21,15,12,10)
+
+RA <- c(0,1,2,3,4,5,6,7,8,9,10,11)
+
+#48.8% men using sex ratio of 1.05
+#Read in Japan Data from CSV
+japan_births <- read.csv("UNdata_Export_20211205_201842295.csv")
+#Aggregate by month
+agg_births <- aggregate(japan_births$Value, by=list(Category=japan_births$Month), FUN=sum)
+colnames(agg_births) <- c("Month","Births")
+
+#Find total males born 
+agg_births$Births <- agg_births$Births *0.488
+#Arrange April to March
+agg_births <- agg_births %>% arrange(factor(Month, levels = months))
+agg_births <- head(agg_births,-2)
+
+#
+births <- agg_births$Births
+
+#make dataframe
+data_df <- data.frame(months, players, RA, births)
+pander(data_df, caption="Initial Data From Paper")
+
+```
+
+```{r initial_linearity, eval=FALSE, message=F}
+#Plot players vs RA to get a sense of linearity on continuous scale of players vs RA
+plot(x=data_df$RA, y= log(data_df$players), xlab="RA", ylab="log(players)")
+abline(lm(log(data_df$players) ~ data_df$RA))
+```
+
+```{r sim_players, eval=F, message=F}
+library(rjags)
+library(coda)
+library(extraDistr)
+library(pander)
+set.seed(1205)
+
+data_jags <- list(y = players, RA = RA, births=births)
+
+#y_ppd is posterior prediction for players in each month
+pars_to_save <- c("alpha","beta","lambda","y_ppd")
+jags_out_pre <- jags.model("jags_model.txt", 
+                           data = data_jags, 
+                           n.adapt=1000, n.chains = 5)
+
+jags_out <- coda.samples(jags_out_pre, pars_to_save,
+                         n.iter = 25000, thin = 1)
+sum_jags <- summary(jags_out)
+set.seed(1213)
+#Sample from the initial run to get simulated players
+idx_samp_jags <- sample(1:25000, size = 1000, rep = F)
+all_samps_jags <- do.call(rbind, jags_out)
+plot_samps_jags <- data.frame(all_samps_jags[idx_samp_jags, ])
+
+sim_lambda <- vector(length=length(RA))
+for (i in 1:length(RA)){
+   alpha <- sample(plot_samps_jags$alpha, size=1)
+   beta <- sample(plot_samps_jags$beta, size=1)
+   sim_lambda[i] <- births[i]*exp(alpha+beta*RA[i])
+}
+
+sim_players <-vector(length=length(RA))
+
+for (i in 1:12){
+  sim_players[i] <- rpois(1, sim_lambda[i])
+}
+
+data_df$Sim.Players <- sim_players
+pander(data_df, caption="Simulated Player Data")
+
+```
+
+```{r linearity_sim_players, eval=F,message=F}
+#Plot simulated players vs RA to get a sense of linearity on continuous scale of players vs RA
+plot(x=data_df$RA, y= log(sim_players), xlab="RA", ylab="log(players)")
+abline(lm(log(sim_players) ~ data_df$RA))
+```
+
+```{r trace_alpha_beta, eval=F, message=F}
+library(bayesplot)
+set.seed(1205)
+
+#Rerun the modeled with simulated players
+data_jags_sim <- list(y = sim_players, RA = RA, births=births)
+
+#y_ppd is posterior prediction for players in each month
+pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
+jags_out_pre_sim <- jags.model("jags_model.txt",
+                           data = data_jags_sim ,
+                           n.adapt=1000, n.chains = 5)
+jags_out_sim <- coda.samples(jags_out_pre_sim, pars_to_save_sim ,
+                         n.iter = 25000, thin = 1)
+#Rerun the modeled with simulated players
+data_jags_sim <- list(y = sim_players, RA = RA, births=births)
+
+#y_ppd is posterior prediction for players in each month
+pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
+jags_out_pre_sim <- jags.model("jags_model.txt",
+                           data = data_jags_sim ,
+                           n.adapt=1000, n.chains = 5)
+jags_out_sim <- coda.samples(jags_out_pre_sim, pars_to_save_sim ,
+                         n.iter = 25000, thin = 1)
+#Check mixing on the chains
+#sum_jags_sim <- summary(jags_out_sim)
+
+mcmc_trace(jags_out_sim, pars=c("alpha","beta"))
+
+
+```
+
+```{r trace_plots_lambda, eval=F, message=F}
+#trace plots for lambda values 
+mcmc_trace(jags_out_sim, pars=c("lambda[1]","lambda[2]", "lambda[3]","lambda[4]",
+                                "lambda[5]","lambda[6]","lambda[7]","lambda[8]",
+                                "lambda[9]","lambda[10]","lambda[11]","lambda[12]"))
+
+```
+
+```{r post_burn_samps, eval=F, message=F}
+library(tidyverse)
+library(janitor)
+library(kableExtra)
+#Use a 12,000 burn in although chains seems fine
+jags_final <- lapply(jags_out_sim, function(x){out <- as.mcmc(x[12001:25000, ])})
+jags_final <- as.mcmc.list(jags_final)
+
+neff <- effectiveSize(jags_final)
+r_hat_final <- matrix(NA, nrow=nvar(jags_final), ncol=2)
+for (v in 1:nvar(jags_final)) {
+  r_hat_final[v,] <- gelman.diag(jags_final[,v])$psrf
+}
+
+diag_df <- data.frame(round(r_hat_final[1],3), neff)
+colnames(diag_df) <- c("R Hat", "Neff") 
+kbl(diag_df[1:14,], caption = "Model Diagnostics")
+```
+
+```{r}
+#geweke.diag(jags_final)
+
+```
+
+
+```{r post_predict, eval=F, message=F}
+
+#Sample from the posterior prediction
+idx_samp_jags <- sample(1:12000, size = 1000, rep = F)
+all_samps_jags <- do.call(rbind, jags_final)
+plot_samps_jags <- data.frame(all_samps_jags[idx_samp_jags, ])
+
+#Function for posterior prediction
+post_predict <- function(samples, length, data, label){
+plot(table(samples)/length, 
+     main = paste0("Post Predic ", label),
+     type = "h", ylab = "Density", 
+     xlab = "y",
+     col = rgb(0.1,0.1,0.1, 0.2))
+points(as.integer(names(table(samples))), table(samples)/length, pch = 20, cex = 2)
+abline(v=data,col="blue",lwd=3)
+}
+
+par(mfrow=c(3,4))
+post_predict(plot_samps_jags$y_ppd.1.,1000,sim_players[1], data_df$months[1])
+post_predict(plot_samps_jags$y_ppd.2.,1000,sim_players[2], data_df$months[2])
+post_predict(plot_samps_jags$y_ppd.3.,1000,sim_players[3], data_df$months[3])
+
+post_predict(plot_samps_jags$y_ppd.4.,1000,sim_players[4], data_df$months[4])
+post_predict(plot_samps_jags$y_ppd.5.,1000,sim_players[5], data_df$months[5])
+post_predict(plot_samps_jags$y_ppd.6.,1000,sim_players[6], data_df$months[6])
+
+post_predict(plot_samps_jags$y_ppd.7.,1000,sim_players[7], data_df$months[7])
+post_predict(plot_samps_jags$y_ppd.8.,1000,sim_players[8], data_df$months[8])
+post_predict(plot_samps_jags$y_ppd.9.,1000,sim_players[9], data_df$months[9])
+
+post_predict(plot_samps_jags$y_ppd.10.,1000,sim_players[10], data_df$months[10])
+post_predict(plot_samps_jags$y_ppd.11.,1000,sim_players[11], data_df$months[11])
+post_predict(plot_samps_jags$y_ppd.12.,1000,sim_players[12], data_df$months[12])
+
+```
+
+
+```{r Dis_RR_visual, eval=F,message=F}
+library(gridExtra)
+#Calculate probabilities of become a professional athlete by month
+dis_RR_df <- data.frame(April=plot_samps_jags$y_ppd.1./data_df$births[1],
+                                       May= plot_samps_jags$y_ppd.2./data_df$births[2],
+                                       June=plot_samps_jags$y_ppd.3./data_df$births[3],
+                                       July=plot_samps_jags$y_ppd.4./data_df$births[4],
+                                       August=plot_samps_jags$y_ppd.5./data_df$births[5],
+                                       September=plot_samps_jags$y_ppd.6./data_df$births[6],
+                                       October=plot_samps_jags$y_ppd.7./data_df$births[7],
+                                       November=plot_samps_jags$y_ppd.8./data_df$births[8],
+                                       December=plot_samps_jags$y_ppd.9./data_df$births[9],
+                                       January=plot_samps_jags$y_ppd.10./data_df$births[10],
+                                       February=plot_samps_jags$y_ppd.11./data_df$births[11],
+                                       March=plot_samps_jags$y_ppd.12./data_df$births[12])
+
+#Find disadvantage 
+dis_RR_df$April_Apr_Dis <- (dis_RR_df$April-dis_RR_df$April)/dis_RR_df$April
+dis_RR_df$April_May_Dis <- (dis_RR_df$April-dis_RR_df$May)/dis_RR_df$April
+dis_RR_df$April_Jun_Dis <- (dis_RR_df$April-dis_RR_df$June)/dis_RR_df$April
+dis_RR_df$April_Jul_Dis <- (dis_RR_df$April-dis_RR_df$July)/dis_RR_df$April
+dis_RR_df$April_Aug_Dis <- (dis_RR_df$April-dis_RR_df$August)/dis_RR_df$April
+dis_RR_df$April_Sept_Dis <- (dis_RR_df$April-dis_RR_df$September)/dis_RR_df$April
+dis_RR_df$April_Oct_Dis <- (dis_RR_df$April-dis_RR_df$October)/dis_RR_df$April
+dis_RR_df$April_Nov_Dis <- (dis_RR_df$April-dis_RR_df$November)/dis_RR_df$April
+dis_RR_df$April_Dec_Dis <- (dis_RR_df$April-dis_RR_df$December)/dis_RR_df$April
+dis_RR_df$April_Jan_Dis <- (dis_RR_df$April-dis_RR_df$January)/dis_RR_df$April
+dis_RR_df$April_Feb_Dis <- (dis_RR_df$April-dis_RR_df$February)/dis_RR_df$April
+dis_RR_df$April_March_Dis <- (dis_RR_df$April-dis_RR_df$March)/dis_RR_df$April
+
+#Find relative risk
+dis_RR_df$April_Mar_RR <- (dis_RR_df$April/dis_RR_df$March)
+dis_RR_df$May_Mar_RR <- (dis_RR_df$May/dis_RR_df$March)
+dis_RR_df$June_Mar_RR <- (dis_RR_df$June/dis_RR_df$March)
+dis_RR_df$July_Mar_RR <- (dis_RR_df$July/dis_RR_df$March)
+dis_RR_df$August_Mar_RR <- (dis_RR_df$August/dis_RR_df$March)
+dis_RR_df$September_Mar_RR <- (dis_RR_df$September/dis_RR_df$March)
+dis_RR_df$October_Mar_RR <- (dis_RR_df$October/dis_RR_df$March)
+dis_RR_df$November_Mar_RR <- (dis_RR_df$November/dis_RR_df$March)
+dis_RR_df$December_Mar_RR <- (dis_RR_df$December/dis_RR_df$March)
+dis_RR_df$January_Mar_RR <- (dis_RR_df$January/dis_RR_df$March)
+dis_RR_df$February_Mar_RR <- (dis_RR_df$February/dis_RR_df$March)
+dis_RR_df$March_Mar_RR <- (dis_RR_df$March/dis_RR_df$March)
+
+
+calc_quantiles <- function(disagvantage,rel_risk){
+  return(c(quantile(disagvantage,0.025),quantile(disagvantage,0.50),quantile(disagvantage,0.975),
+           quantile(rel_risk,0.025),quantile(rel_risk,0.50),quantile(rel_risk,0.975)))
+}
+apr <- calc_quantiles(dis_RR_df$April_Apr_Dis,dis_RR_df$April_Mar_RR)
+may <- calc_quantiles(dis_RR_df$April_May_Dis, dis_RR_df$May_Mar_RR)
+jun <- calc_quantiles(dis_RR_df$April_Jun_Dis, dis_RR_df$June_Mar_RR)
+jul <- calc_quantiles(dis_RR_df$April_Jul_Dis, dis_RR_df$July_Mar_RR)
+aug <- calc_quantiles(dis_RR_df$April_Aug_Dis, dis_RR_df$August_Mar_RR)
+sep <- calc_quantiles(dis_RR_df$April_Sept_Dis, dis_RR_df$September_Mar_RR)
+oct <- calc_quantiles(dis_RR_df$April_Oct_Dis, dis_RR_df$October_Mar_RR)
+nov <- calc_quantiles(dis_RR_df$April_Nov_Dis, dis_RR_df$November_Mar_RR)
+dec <- calc_quantiles(dis_RR_df$April_Dec_Dis, dis_RR_df$December_Mar_RR)
+jan <- calc_quantiles(dis_RR_df$April_Jan_Dis, dis_RR_df$January_Mar_RR)
+feb <- calc_quantiles(dis_RR_df$April_Feb_Dis, dis_RR_df$February_Mar_RR)
+mar <- calc_quantiles(dis_RR_df$April_March_Dis, dis_RR_df$March_Mar_RR)
+
+mean_dis_RR <- data.frame(April=apr,
+                          May=may,
+                          June=jun,
+                          July=jul,
+                          August=aug,
+                          September=sep,
+                          October=oct,
+                          November=nov,
+                          December=dec,
+                          January=jan,
+                          February=feb,
+                          March=mar)
+
+row.names(mean_dis_RR) <- c("Disadvantage_2.5", "Disadvantage_50","Disadvantage_97.5", 
+                            "Relative_Risk_2.5","Relative_Risk_50","Relative_Risk_97.5")
+
+#Relative risk and Disadvantage Data Transposed
+df <- data.frame(t(mean_dis_RR))
+
+
+#Plots from page 150 in paper
+dis_plot <- df %>%
+    ggplot(aes(x=row.names(df), y = Disadvantage_50*100, group=1)) +
+    geom_line()+
+    scale_x_discrete(limits =months)+
+    geom_point(aes(y = Disadvantage_2.5*100)) + 
+    geom_point(aes(y = Disadvantage_97.5*100)) + xlab("Birth Month") + ylab("Disadvantage %") +
+    scale_y_continuous(breaks=seq(-50,100,by=20)) +
+    ggtitle("Disadvantage % vs April and 95% Posterior Invervals")
+
+
+rr_plot <- df %>%
+    ggplot(aes(x=row.names(df), y = Relative_Risk_50, group=1)) +
+    geom_line()+
+    scale_x_discrete(limits =months)+
+    geom_point(aes(y = Relative_Risk_2.5)) + 
+    geom_point(aes(y = Relative_Risk_97.5)) + xlab("Birth Month") + ylab("Relative Risk")+
+    scale_y_continuous(breaks=seq(-0,12,by=1.5))+
+    ggtitle("Relative Risk vs March and 95% Posterior Invervals")
+
+grid.arrange(dis_plot, rr_plot, ncol=1)
+```
+
