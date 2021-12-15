@@ -414,21 +414,29 @@ df <- data.frame(t(mean_dis_RR))
 dis_plot <- df %>%
     ggplot(aes(x=row.names(df), y = Disadvantage_50*100, group=1)) +
     geom_line()+
+  geom_point(size = 2) + 
     scale_x_discrete(limits =months)+
-    geom_point(aes(y = Disadvantage_2.5*100)) + 
-    geom_point(aes(y = Disadvantage_97.5*100)) + xlab("Birth Month") + ylab("Disadvantage %") +
+  geom_segment(aes(x=row.names(df), xend = row.names(df), 
+                   y = Disadvantage_2.5*100, yend = Disadvantage_97.5*100), 
+               inherit.aes = F, lwd = 3, alpha = 0.5, linetype = 1, color = "steelblue") + 
+  xlab("Birth Month") + 
+  ylab("Disadvantage (%)") +
     scale_y_continuous(breaks=seq(-50,100,by=20)) +
-    ggtitle("Disadvantage % vs April and 95% Posterior Invervals")
+    ggtitle("Disadvantage compared to April with 95% Posterior Invervals")
 
 
 rr_plot <- df %>%
     ggplot(aes(x=row.names(df), y = Relative_Risk_50, group=1)) +
     geom_line()+
+  geom_point(size = 2) +
     scale_x_discrete(limits =months)+
-    geom_point(aes(y = Relative_Risk_2.5)) + 
-    geom_point(aes(y = Relative_Risk_97.5)) + xlab("Birth Month") + ylab("Relative Risk")+
-    scale_y_continuous(breaks=seq(-0,12,by=1.5))+
-    ggtitle("Relative Risk vs March and 95% Posterior Invervals")
+  geom_segment(aes(x=row.names(df), xend = row.names(df), 
+                   y = Relative_Risk_2.5, yend = Relative_Risk_97.5), 
+               inherit.aes = F, lwd = 3, alpha = 0.5, linetype = 1, color = "steelblue") +
+  xlab("Birth Month") + 
+  ylab("Relative Risk")+
+    scale_y_continuous(breaks=seq(-0,12,by=1))+
+    ggtitle("Relative Risk compared to March with 95% Posterior Invervals")
 
 grid.arrange(dis_plot, rr_plot, ncol=1)
 ```
