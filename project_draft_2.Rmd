@@ -45,39 +45,36 @@ $$\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
 #### Priors
 Mimicking the suggestions in the paper, we put uninformative priors on our regression coefficients where
 
-$$\alpha \sim \text{Normal}(\mu_\alpha,\sigma_\alpha^2)$$ 
-$$\mu_\alpha \sim \text{Normal}(0,100^2)$$ 
-$$\sigma_\alpha \sim \text{Uniform}(0,100)$$
-$$\beta \sim \text{Normal}(\mu_\beta, \sigma_\beta^2)$$
-$$\mu_\beta \sim \text{Normal}(0,100^2)$$
-$$\sigma_\beta \sim \text{half-Cauchy(5)}$$
+$$\alpha \sim \text{Normal}(\mu_\alpha,\sigma_\alpha^2) \text{ with } \mu_\alpha \sim \text{Normal}(0,100^2) \text{ and } \sigma_\alpha \sim \text{Uniform}(0,100)$$
+$$\beta \sim \text{Normal}(\mu_\beta, \sigma_\beta^2) \text{ with } \mu_\beta \sim \text{Normal}(0,100^2) \text{ and } \sigma_\beta \sim \text{half-Cauchy(5)}$$
+
 #### Offset Term 
 The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true and we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a Poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a Poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a Poisson regression model for counts except we multiply the expected counts by $\theta_i$.
 
-For an initial model to simulate data from, we used the 227 professional J. League players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between log(players) and RA. As shown in Figure 1, this linearity assumption seems reasonable.  
+For an initial model to simulate data from, we used the 227 professional J. League players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between the count of players (logged) and relative age (RA). As shown in Figure 1, this linearity assumption seems reasonable.  
 
 ```{r echo =F, message=F, ref.label= "initial_data"}
 
 ```
 
-```{r echo =F, message=F, ref.label= "initial_linearity", fig.cap="log(players) vs RA", fig.height=3}
+```{r echo =F, message=F, ref.label= "initial_linearity", fig.cap="By visualizing the relationship between the count of players logged against their relative age (where RA is 0, 1, ... 11), and using a loess smoothing function to interpolate between values, we can confirm that our assumption of linearity is reasonable.", fig.height=3}
 
 ```
 
 ## Simulation of Artificial Data
 
-Using the player data in the paper and our estimates for total male births, we fit our model from which to simulate professional players per month. Our model generates a posterior distribution for the $\alpha$ and $\beta$ coefficients. First, we randomly sampled 1,000 $\alpha$ and $\beta$ values from our posterior and for each month $i$, randomly sampled one $\alpha$ and one $\beta$ from which we calculated a simulated $\lambda_i$ value using the formula: 
+Using the player data in the paper and our estimates for total male births, we fit our model from which to simulate professional players per month. Our JAGS model generates a posterior distribution for the $\alpha$ and $\beta$ coefficients. First, we throw away half of our iterations as burn in and we are left with 12,000. Of these we drew 1,000 $\alpha$s and $\beta$s for each month $i$. We then randomly sampled one $\alpha$ and one $\beta$ from which we derived $\lambda_i$ using the link function below: 
 
 $$\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
 
 Using this $\lambda_i$ value, we randomly sampled a $y_i$ from the `rpois` function in R. 
 
-As reported in Table 2, the simulated players for each month seems reasonable, although we do see some variation between the player data reported in the paper and our simulated values. In Figure 2, we check the linearity between log(sim players) and RA, which also seems reasonable, but note that the simulated data appears more disperse for January through March. 
+As reported in Table 2, the simulated players for each month seems reasonable, although we do see some variation between the player data reported in the paper and our simulated values. In Figure 2, we visualize the simulated count of players (logged) and relative age (RA), and see an even more linear relationship than in Figure 1 as we would expect. Note that the simulated data appears more disperse for January through March. 
 
 ```{r echo =F, message=F, ref.label= "sim_players", fig.cap="Simulated Data"}
 ```
 
-```{r echo =F, message=F, ref.label= "linearity_sim_players", fig.cap="Simulated log(players) vs RA"}
+```{r echo =F, message=F, ref.label= "linearity_sim_players", fig.cap="Once we have simulated the player count data by month we again log and graph it to compare it's shape to our original data in Figure 1. Our loess smoothing function looks even more linear than Figure 1, which makes sense given this the model used to simulate our data. Overall our simulated data look similar to our original data.", fig.height=3}
 
 ```
 
@@ -157,9 +154,19 @@ pander(data_df, caption="Initial Data From Paper")
 ```
 
 ```{r initial_linearity, eval=FALSE, message=F}
+library(ggplot2)
 #Plot players vs RA to get a sense of linearity on continuous scale of players vs RA
-plot(x=data_df$RA, y= log(data_df$players), xlab="RA", ylab="log(players)")
-abline(lm(log(data_df$players) ~ data_df$RA))
+# plot(x=data_df$RA, y= log(data_df$players), xlab="RA", ylab="log(players)")
+# abline(lm(log(data_df$players) ~ data_df$RA))
+
+ggplot(data = data_df, aes(x=RA, y = log(players))) +
+  geom_point() +
+  xlab("Relative Age (RA)") +
+  ylab("Count of Players (logged)") +
+  ggtitle("Assessing The Reasonability of Linearity between \n Logged Count of Players and Relative Age") +
+  geom_smooth(method = 'loess', se=FALSE, span=1) + 
+  theme(plot.title = element_text(hjust = 0.5))
+
 ```
 
 ```{r sim_players, eval=F, message=F}
@@ -181,14 +188,15 @@ jags_out <- coda.samples(jags_out_pre, pars_to_save,
 sum_jags <- summary(jags_out)
 set.seed(1213)
 #Sample from the initial run to get simulated players
-idx_samp_jags <- sample(1:25000, size = 1000, rep = F)
+idx_samp_jags <- sample(12000:25000, size = 1000, rep = F)
 all_samps_jags <- do.call(rbind, jags_out)
 plot_samps_jags <- data.frame(all_samps_jags[idx_samp_jags, ])
 
+alpha <- sample(plot_samps_jags$alpha, size=1)
+beta <- sample(plot_samps_jags$beta, size=1)
+
 sim_lambda <- vector(length=length(RA))
 for (i in 1:length(RA)){
-   alpha <- sample(plot_samps_jags$alpha, size=1)
-   beta <- sample(plot_samps_jags$beta, size=1)
    sim_lambda[i] <- births[i]*exp(alpha+beta*RA[i])
 }
 
@@ -205,8 +213,16 @@ pander(data_df, caption="Simulated Player Data")
 
 ```{r linearity_sim_players, eval=F,message=F}
 #Plot simulated players vs RA to get a sense of linearity on continuous scale of players vs RA
-plot(x=data_df$RA, y= log(sim_players), xlab="RA", ylab="log(players)")
-abline(lm(log(sim_players) ~ data_df$RA))
+# plot(x=data_df$RA, y= log(sim_players), xlab="RA", ylab="log(players)")
+# abline(lm(log(sim_players) ~ data_df$RA))
+
+ggplot(data = data_df, aes(x=RA, y = log(sim_players))) +
+  geom_point() +
+  xlab("Relative Age (RA)") +
+  ylab("Count of Players (logged)") +
+  ggtitle("Inspecting Simulated Data for \n Logged Count of Players and their Relative Age") +
+  geom_smooth(method = 'loess', se=FALSE, span = 1) + 
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ```{r trace_alpha_beta, eval=F, message=F}
