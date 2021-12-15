@@ -103,12 +103,15 @@ In our JAGS model, we kept track of the posterior predicted values for $y_i$, us
 ```
 
 
-Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. In Figure 6, we report the mean disadvantage compared to April and relative risk as compared to March. 
+Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. The mean and 95% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since April is the most likely month for a professional player to be born<!--  (most advantageous?)--> and March is the least likely, all other months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July. 
 
+<!-- Model assumptions! --> 
 
 ```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and Relative Risk by Month", fig.height=6, fig.width=8}
 
 ```
+
+# Conclusions
 
 
 
@@ -418,10 +421,10 @@ dis_plot <- df %>%
   geom_segment(aes(x=row.names(df), xend = row.names(df), 
                    y = Disadvantage_2.5*100, yend = Disadvantage_97.5*100), 
                inherit.aes = F, lwd = 3, alpha = 0.5, linetype = 1, color = "steelblue") + 
-  xlab("Birth Month") + 
+  xlab("") + 
   ylab("Disadvantage (%)") +
     scale_y_continuous(breaks=seq(-50,100,by=20)) +
-    ggtitle("Disadvantage compared to April with 95% Posterior Invervals")
+    ggtitle("Disadvantage compared to April with 95% Posterior Intervals")
 
 
 rr_plot <- df %>%
@@ -435,7 +438,7 @@ rr_plot <- df %>%
   xlab("Birth Month") + 
   ylab("Relative Risk")+
     scale_y_continuous(breaks=seq(-0,12,by=1))+
-    ggtitle("Relative Risk compared to March with 95% Posterior Invervals")
+    ggtitle("Relative Risk compared to March with 95% Posterior Intervals")
 
 grid.arrange(dis_plot, rr_plot, ncol=1)
 ```
