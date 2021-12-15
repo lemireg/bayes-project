@@ -1,5 +1,7 @@
 ---
-title: "Project_Draft_2"
+title: "Relative age effect in Japan Professional Football League"
+author: "Connor Demorest, Gabrielle Lemire, and James B. Wilson"
+fontsize: 12 pt
 output: pdf_document
 ---
 
@@ -10,35 +12,43 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Much research has been done to look at RAE in North American and European athletes. However very little research has attempted to extend findings surrounding RAE to other parts of the world, specifically Asia. In this paper, we attempt to replicate the work done in Hideaki Ishigami's paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* (published in the Journal of Sports Sciences in 2016). In our paper we simplify Ishigami's modelling process using simulated data. <!-- research question(s) clearly state -->
-In order to answer the question: what is the RAE on soccer players in Japan between the ages of 23 and 25 in the 2012 season?
+The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Much research has been done to look at RAE in North American and European athletes. However very little research has attempted to extend findings surrounding RAE to other parts of the world, specifically Asia. In this paper, we attempt to replicate the work done in Hideaki Ishigami's paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* (published in the Journal of Sports Sciences in 2016). 
 
-Our simulation and modeling process will simplify the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and since we will focus on players between the ages of 23 and 25, we have 227 observations. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
+Our simulation and modeling process will simplify the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and focusing on players between the ages of 23 and 25. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
 
 The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Finally this paper also includes an offset term in our model to capture the differences in birth rates by month which has also often been left out in other analyses. All of these factors make this topic and methodology valuable in the literature on RAE. 
 
-In this paper we are interested in the magnitude of the RAE effect sizes between months, and in particular, the disadvantage for each month as compared to April and relative risk between each month and March. Disadvantage evaluates the extent to which children have a relative disadvantage across months. For example, if the disadvantage is measured at 10% between two months, then the chance of becoming a professional athlete for a child born one month later will be 90% of that born in the previous month. Relative risk on the other hand, is the ratio of the probabilities of becoming a professional athlete. The larger the relative risk, the greater the advantage children born earlier have over children born later in the year in terms of becoming a professional athlete. 
+We are interested in the magnitude of the RAE effect sizes between months, and in particular, the disadvantage for each month as compared to April and relative risk between each month and March. Disadvantage evaluates the extent to which children have a relative disadvantage across months. For example, if the disadvantage is measured at 10% between two months, then the chance of becoming a professional athlete for a child born one month later will be 90% of that born in the previous month. Relative risk on the other hand, is the ratio of the probabilities of becoming a professional athlete. The larger the relative risk, the greater the advantage children born earlier have over children born later in the year in terms of becoming a professional athlete. 
 
 ## Model
 
 The author used a Bayesian hierarchical Poisson model to estimate the effects of becoming a professional athlete where, 
+
 $$y_{ijk} \sim \text{Poisson}(\lambda_{ijk}), \text{   for   } i=1,\dots,12; j=1\dots,47; k=1,2;$$
 $$\lambda_{ijk} = \theta_{ij}\text{exp}\Big(\alpha_j + \beta_kRA_i +\gamma\text{Weather}_j + \delta_1\text{Pop}_j + \delta_2\text{Pop}^2 + \epsilon_i +\eta I[k=1]\Big)$$
-In this model, $y_{ijk}$ is the number of professional players, and subscripts $i,j$ and $k$ indicate birth month, prefecture, and sport. $\theta_{ij}$ represents the total number of male children born in month $i$ in prefecture $j$. The intercept term, $\alpha_j$, aims to capture the differences in the likelihoods between the birthplaces that remains after controlling for the two factors of population size and weather conditions. $RA_i$ is the relative age of those born in month $i$ and the coefficients on $\beta_k$, measure the relative age effect. In this paper, we simplify this model by removing the hierarchical component, prefecture, and measure only the RAE between months for J. League soccer players. 
+In this model, $y_{ijk}$ is the number of professional players, and subscripts $i,j$ and $k$ indicate birth month, prefecture, and sport (soccer and baseball). $\theta_{ij}$ represents the total number of male children born in month $i$ in prefecture $j$. The intercept term, $\alpha_j$, aims to capture the differences in the likelihoods between the birthplaces that remains after controlling for the two factors of population size and weather conditions. $RA_i$ is the relative age of those born in month $i$ and the coefficients on $\beta_k$, measure the relative age effect. In this paper, we simplify this model by removing the hierarchical component given to prefecture, along with the factors of population and weather conditions, and measure only the RAE between months for J. League soccer players. 
 
-Each of our observations is the total number of professional J. League players born in a given month. The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Since school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March). Our data are denoted by $y_{i}$, which represents the number of professional sports players between ages 23 and 25 in the year 2012 who are born in a given month. Our simplified model is therefore 
+We are interested in estimating the total number of professional J. League players born in a given month. The school year in Japan begins April and ends on March of the following calendar year, which corresponds with the competitive season of most professional sports. Since school year and competitive season both begin in April in Japan, relative age was coded as 0 (April) to 11 (March). Our data are denoted by $y_{i}$, which represents the number of professional sports players between ages 23 and 25 in the year 2012 who are born in month $i$. Our simplified model is therefore 
+
 $$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
 Where our likelihood function is:
 $$L(\lambda; y_0, ... y_{11}) = \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!}$$
 And our log-likelihood is:
 $$l(\lambda; y_0, ... y_{11}) = -11\lambda - \sum_{i=0}^{11}ln(y_i!)+ ln(\lambda)\sum_{i=0}^{11}y_i$$
 
-## ADD PRIOR INFO HERE
+## Priors
 
+Mimicking the suggestions in the paper, we put uninformative priors on our regression coefficients where
 
+$$\alpha \sim \text{Normal}(\mu_\alpha,\sigma_\alpha^2)$$ 
+$$\mu_\alpha \sim \text{Normal}(0,100^2)$$ 
+$$\sigma_\alpha \sim \text{Uniform}(0,100)$$
+$$\beta \sim \text{Normal}(\mu_\beta, \sigma_\beta^2)$$
+$$\mu_\beta \sim \text{Normal}(0,100^2)$$
+$$\sigma_\beta \sim \text{half-Cauchy(5)}$$
 The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true and we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a poisson regression model for counts except we multiply the expected counts by $\theta_i$.
 
-For an initial model to simulate data from, we used the 227 professional soccer players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. These are the birth years for 23-25 year old athletes in 2012. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between log(players) and RA. As shown in Figure 1, this linearity assumption seems reasonable.  
+For an initial model to simulate data from, we used the 227 professional J. League players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between log(players) and RA. As shown in Figure 1, this linearity assumption seems reasonable.  
 
 ```{r echo =F, message=F, ref.label= "initial_data"}
 
@@ -48,7 +58,15 @@ For an initial model to simulate data from, we used the 227 professional soccer 
 
 ```
 
-Using this data, we fit our model from which to simulate professional players per month. As reported in Table 2, the simulated players for each month seem reasonable, although July is a bit larger than the original data. The lineariy between log(sim players) and RA also seems reasonable, but not that the simulated data appears more disperse. 
+## Simulation of Artificial Data
+
+Using the player data in the paper and our estimates for total male births, we fit our model from which to simulate professional players per month. Our model generates a posterior distribution for the $\alpha$ and $\beta$ coefficients. First, we randomly sampled 1,000 $\alpha$ and $\beta$ values from our posterior and for each month $i$, randomly sampled one $\alpha$ and one $\beta$ from which we calculated a simulated $\lambda_i$ value using the formula: 
+
+$$\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
+
+Using this $\lambda_i$ value, we randomly sampled a $y_i$ from the `rpois` function in R. 
+
+As reported in Table 2, the simulated players for each month seems reasonable, although we do see some variation between the player data reported in the paper and our simulated values. In Figure 2, we check the linearity between log(sim players) and RA, which also seems reasonable, but note that the simulated data appears more disperse for January through March. 
 
 ```{r echo =F, message=F, ref.label= "sim_players", fig.cap="Simulated Data"}
 ```
@@ -57,8 +75,7 @@ Using this data, we fit our model from which to simulate professional players pe
 
 ```
 
-
-Using this simulated player data for $y_i$, we ran a our model in JAGS with 5 chains, each with 25,000 iterations. Figures 3 and 4 show the trace plots for $\alpha$, $\beta$, and $\lambda_i$. The chains appear to be mixing well and do not see any issues. 
+Using this simulated player data for $y_i$, we ran our model in JAGS with 5 chains, each with 25,000 iterations. Figures 3 and 4 show the trace plots for $\alpha$, $\beta$, and $\lambda_i$. The chains appear to be mixing well and we do not see any issues or concerns. 
 
 ```{r echo =F, message=F, ref.label= "trace_alpha_beta", fig.cap="Trace Plots for Alpha and Beta Coefficients"}
 
@@ -68,9 +85,7 @@ Using this simulated player data for $y_i$, we ran a our model in JAGS with 5 ch
 
 ```
 
-
-
-As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnostics reported in Table 3. We obtain $\hat{R}$'s of approximately 1 for all parameters, suggesting convergence and see healthy $n_{eff}$ for each parameter. We did note large $n_{neff}$ on prior hyperparameters greater than the number of iterations performed, which we found odd but were unable to make sense of. **elaborate**
+As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnostics reported in Table 3. We obtain $\hat{R}$'s of approximately 1 for all parameters, suggesting convergence and see healthy $n_{eff}$ for each parameter. However, when checking full model diagnostics for all parameters, including our priors, we found $n_{neff}$'s greater than the number of iterations performed, for the $\sigma_\alpha$ and $\sigma_\beta$ hyperparameters, which we found odd but were unable to make sense of. Despite this, the chains for our parameters of interest appear to be mixing well and the $\hat{R}$'s do not indicate any convergence concerns. 
 
 
 ```{r echo =F, message=F, ref.label= "post_burn_samps"}
@@ -78,12 +93,18 @@ As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnos
 ```
 
 
-In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to make sure that our model can accurately capture the simulated data. We noted an unusual simulated data point for July, but it appears that the model realistically capture these features in the data and there is no need for modification. 
+\newpage 
+
+# Posterior Predictive Check and Model Assessment
+
+In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior generated values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to ensure that our model can accurately capture the simulated data. We noted unusual simulated data points, in relation to the player data reported in the paper, but it appears that our simplified model realistically capture these features and find no need for modification. 
 
 ```{r echo =F, message=F, ref.label= "post_predict", fig.cap="Posterior Prediction for Players per month", fig.height=6, fig.width=8}
 
 ```
 
+
+Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. In Figure 6, we report the mean disadvantage compared to April and relative risk as compared to March. 
 
 
 ```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and Relative Risk by Month", fig.height=6, fig.width=8}
@@ -140,7 +161,6 @@ library(rjags)
 library(coda)
 library(extraDistr)
 library(pander)
-set.seed(1205)
 
 data_jags <- list(y = players, RA = RA, births=births)
 
