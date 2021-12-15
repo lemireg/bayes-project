@@ -36,11 +36,7 @@ In this paper, we simplify this model by removing the hierarchical component giv
 #### Likelihood
 Our data are denoted by $y_{i}$, which represents the number of professional sports players between ages 23 and 25 in the year 2012 who are born in month $i$. Our simplified likelihood model is therefore\footnote{With a likelihood funtion $L(\lambda; y_0, ... y_{11}) = \prod_{i=1}^{12} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!}$, and a log-likelihood function of $l(\lambda; y_0, ... y_{11}) = -11\lambda - \sum_{i=1}^{12}ln(y_i!)+ ln(\lambda)\sum_{i=0}^{11}y_i$.}:
 
-$$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12;$$
-
-Where we have link function for $\lambda_{i}$:
-
-$$\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
+$$y_{i} \sim \text{Poisson}(\lambda_{i}) \text{ for months } i=1,\dots,12 \text{ where our link function is } \lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
 
 #### Priors
 Mimicking the suggestions in the paper, we put uninformative priors on our regression coefficients where
@@ -80,11 +76,11 @@ As reported in Table 2, the simulated players for each month seems reasonable, a
 
 Using this simulated player data for $y_i$, we ran our model in JAGS with 5 chains, each with 25,000 iterations. Figures 3 and 4 show the trace plots for $\alpha$, $\beta$, and $\lambda_i$. The chains appear to be mixing well and we do not see any issues or concerns. 
 
-```{r echo =F, message=F, ref.label= "trace_alpha_beta", fig.cap="Trace Plots for Alpha and Beta Coefficients"}
+```{r echo =F, message=F, ref.label= "trace_alpha_beta", fig.cap="We can see excellent mixing and stationarity in our traceplots for $\\alpha$ and $\\beta$. Although in our results we drop the first half of our iterations, all are included here for visual inspection.", fig.height=3}
 
 ```
 
-```{r echo =F, message=F, ref.label= "trace_plots_lambda", fig.cap="Trace Plots for Lambda"}
+```{r echo =F, message=F, ref.label= "trace_plots_lambda", fig.cap="Trace Plots for $\\lambda$"}
 
 ```
 
@@ -179,13 +175,16 @@ data_jags <- list(y = players, RA = RA, births=births)
 
 #y_ppd is posterior prediction for players in each month
 pars_to_save <- c("alpha","beta","lambda","y_ppd")
-jags_out_pre <- jags.model("jags_model.txt", 
+jags_out_pre <- rjags::jags.model("jags_model.txt", 
                            data = data_jags, 
-                           n.adapt=1000, n.chains = 5)
+                           n.adapt=1000, n.chains = 5,
+                           inits = list(.RNG.name = "base::Wichmann-Hill",
+                                        .RNG.seed = 1))
 
 jags_out <- coda.samples(jags_out_pre, pars_to_save,
                          n.iter = 25000, thin = 1)
 sum_jags <- summary(jags_out)
+
 set.seed(1213)
 #Sample from the initial run to get simulated players
 idx_samp_jags <- sample(12000:25000, size = 1000, rep = F)
@@ -261,7 +260,7 @@ mcmc_trace(jags_out_sim, pars=c("alpha","beta"))
 #trace plots for lambda values 
 mcmc_trace(jags_out_sim, pars=c("lambda[1]","lambda[2]", "lambda[3]","lambda[4]",
                                 "lambda[5]","lambda[6]","lambda[7]","lambda[8]",
-                                "lambda[9]","lambda[10]","lambda[11]","lambda[12]"))
+                             "lambda[9]","lambda[10]","lambda[11]","lambda[12]"))
 
 ```
 
