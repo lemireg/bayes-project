@@ -1,8 +1,8 @@
 data {
-  int<lower = 0> I;
-  int<lower = 0> y[I];  
-  real<lower = 0> births[I];
-  int<lower = 0> RA[I];
+  int<lower = 0> I; #tot num of months
+  int<lower = 0> y[I];  #num ppl born
+  real<lower = 0> births[I]; #offset/theta
+  int<lower = 0> RA[I]; #coding for months
 }
 
 parameters {

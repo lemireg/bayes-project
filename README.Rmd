@@ -64,7 +64,7 @@ Katie's comment about this:
 
 Given our likelihood and prior our full model can be expressed as follows:
 
-$$P(\lambda_i|\vec{y}) \propto \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!} \times \theta_{i}e^{(\alpha +\beta RA_i)}$$
+$$P(\lambda_i|\vec{y}) \propto \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda_i^{y_i}}{y_i!} \times \theta_{i}e^{(\alpha +\beta RA_i)}$$
 
 Look into whether our posterior is Gamma, and if this is even our posterior of interest: https://stats.stackexchange.com/questions/26199/how-do-i-calculate-a-posterior-distribution-for-a-poisson-model-with-exponential
 
@@ -72,20 +72,21 @@ __Show visual of prior and likelihood with our chosen alpha and beta hyperparams
 
 ## Data Simulation Using Model
 
-### Data for $y_i$
-The author did not provide the data for the birth months of the 227 soccer players aged 23-25 in the 2012 season. However he did refer to the Japan Professional Football League (J. League) website which contains these data. We sought out these data on the given website and __insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - Connor__
+As presented in the previous section, our model is a simplification of the author's hierarchical model. We removed the model terms which provide random effects by prefecture (denoted $j$ in the original paper)
+<!-- Simulation of artificial data (will likely have slightly different and simplified model for this section) (25/100pts) -->
+<!-- Description of simplification to the authors’ model, if necessary -->
+<!-- Data generating process described (i.e., each step of the simulation is clearly explained) -->
+
+### Simulated Data for $y_i$
+The author did not provide the data for the birth months of the 227 soccer players aged 23-25 in the 2012 season. However he did refer to the Japan Professional Football League (J. League) website which contain these data. Since we are interested in using simulated data we actually generate our $y_i$ values using the $\lambda_i$ values for different months **PROVIDED BY THE RESULTS IN THE PAPER**.
 
 ### Data for $\theta_i$
 The author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. These are the birth years for 23-25 year old athletes in 2012. We used birth data by country and year provided by United Nations Statistics Division
 <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 -->
 and the sex ratio for the year 2015 provided by Statista.
 <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ -->
-__insert result of search here and what our data are possibly in a code snippet where we store the values in a vector - James__
 
-### Simulated $\alpha_i$ and $\beta_i$
-<!-- Simulation of artificial data (will likely have slightly different and simplified model for this section) (25/100pts) -->
-<!-- Description of simplification to the authors’ model, if necessary -->
-<!-- Data generating process described (i.e., each step of the simulation is clearly explained) -->
+### Parameter Values for $\alpha_i$ and $\beta_i$
 
 
 <!-- Fake data generated and displayed appropriately -->
