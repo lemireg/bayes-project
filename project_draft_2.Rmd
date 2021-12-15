@@ -406,7 +406,7 @@ dis_plot <- df %>%
   xlab("Birth Month") + 
   ylab("Disadvantage (%)") +
     scale_y_continuous(breaks=seq(-50,100,by=20)) +
-    ggtitle("Disadvantage vs April with 95% Posterior Invervals")
+    ggtitle("Disadvantage compared to April with 95% Posterior Invervals")
 
 
 rr_plot <- df %>%
@@ -420,7 +420,7 @@ rr_plot <- df %>%
   xlab("Birth Month") + 
   ylab("Relative Risk")+
     scale_y_continuous(breaks=seq(-0,12,by=1))+
-    ggtitle("Relative Risk vs March and 95% Posterior Invervals")
+    ggtitle("Relative Risk compared to March with 95% Posterior Invervals")
 
 grid.arrange(dis_plot, rr_plot, ncol=1)
 ```
