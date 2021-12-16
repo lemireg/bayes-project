@@ -98,10 +98,9 @@ As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnos
 
 In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior generated values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to ensure that our model can accurately capture the simulated data. We noted unusual simulated data points, in relation to the player data reported in the paper, but it appears that our simplified model realistically capture these features and find no need for modification. 
 
-```{r echo =F, message=F, ref.label= "post_predict", fig.cap="Posterior Prediction for Players per month", fig.height=6, fig.width=8}
+```{r echo =F, message=F, ref.label= "post_predict", fig.cap="Each of our graphs contains 1000 posterior predictive draws for the number of professional players born in that month. Our blue line indicates the simulated value for y.", fig.height=6, fig.width=8}
 
 ```
-
 
 Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. The mean and 95% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since April is the most likely month for a professional player to be born<!--  (most advantageous?)--> and March is the least likely, all other months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July. 
 
@@ -113,6 +112,28 @@ Since we cannot directly assess the effect sizes from the parameter estimate of 
 
 # Conclusions
 
+
+
+
+
+
+
+
+
+
+
+
+
+# Reflection of Data Analysis in Paper and What We Learned
+
+We believe the chosen paper offers a more sophisticated analytical process with which to assess the question of RAE in comparison to many other previous analyses. As the paper mentions, past work assumed uniform births across all months and therefore estimating a rate by month (and including $\theta_i$'s) is a definite improvement on past methodologies. Although we did not include weather and location in our model these were valuable inclusions on the part of the author. Finally, by providing a Bayesian analysis the author allows the magnitude of our parameters of interest to be investigated in comparison to a Frequentist analysis (such as the $\chi^2$ test) which would simply detect there is a difference but not estimate it.
+
+Despite these improvements, we have some critiques of the paper. The paper was not clear that they are only investigating association and not causation, and thus they ought to have provided a disclaimer in using the term "effect." Despite having access to data on athletes between the ages of 19 and 33, we are unclear why the author limited his analysis to only those between ages 23 and 25. We see this as a limitation given the author could have expanded his scope of inference. Similarly we expect that the original model, which includes weather and athlete location as covariates, would have limited relevance for sports that are not outdoors. Finally, although the author listed previous studies investigating RAE, the author has a very vague prior. We see this as a limitation given Bayesian methodologies can incorporate what was learned in past studies. This is a missed opportunity on the part of the author's original model.
+
+
+# Group Work Collaboration Statement
+
+When we first read the paper, the model itself was a bit confusing. Since we did not have much experience with hierarchical models or with JAGS and Stan, we worked together to figure out how to simplify the model for our purposes. James wrote the JAGS model and Connor confirmed the results with Stan. Gabby spent at least 3 hours setting a seed to get reproducible results\footnote{Temporal liberties were taken with this sentence. Also, I was successful but it broke everything else.}. Connor pointed out spelling mistakes mostly\footnote{His most important role}. James was the only one to show up on time for meetings\footnote{Can confirm.}. James wrote a lot of the code and made a lot of the plots, and Connor helped edit and improve them. James and Gabby wrote the Introduction, Model, Simulation and Critique sections. Connor and James wrote the Model Fitting sections. All three of us worked on the Conclusions but they were on Connors computer so he gets all the credit for that.
 
 
 \newpage
@@ -238,7 +259,11 @@ data_jags_sim <- list(y = sim_players, RA = RA, births=births)
 pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
 jags_out_pre_sim <- jags.model("jags_model.txt",
                            data = data_jags_sim ,
-                           n.adapt=1000, n.chains = 5)
+                           n.adapt=1000, n.chains = 5
+                           # ,
+                           # inits = list(.RNG.name = "base::Wichmann-Hill",
+                           #              .RNG.seed = 1)
+                           )
 jags_out_sim <- coda.samples(jags_out_pre_sim, pars_to_save_sim ,
                          n.iter = 25000, thin = 1)
 #Rerun the modeled with simulated players
@@ -248,15 +273,17 @@ data_jags_sim <- list(y = sim_players, RA = RA, births=births)
 pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
 jags_out_pre_sim <- jags.model("jags_model.txt",
                            data = data_jags_sim ,
-                           n.adapt=1000, n.chains = 5)
+                           n.adapt=1000, n.chains = 5
+                           # ,
+                           # inits = list(.RNG.name = "base::Wichmann-Hill",
+                           #              .RNG.seed = 1)
+                           )
 jags_out_sim <- coda.samples(jags_out_pre_sim, pars_to_save_sim ,
                          n.iter = 25000, thin = 1)
 #Check mixing on the chains
 #sum_jags_sim <- summary(jags_out_sim)
 
 mcmc_trace(jags_out_sim, pars=c("alpha","beta"))
-
-
 ```
 
 ```{r trace_plots_lambda, eval=F, message=F}
