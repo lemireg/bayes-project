@@ -47,7 +47,7 @@ $$\beta \sim \text{Normal}(\mu_\beta, \sigma_\beta^2) \text{ with } \mu_\beta \s
 #### Offset Term 
 The author points out that many analyses of RAE assume that births are uniformly distributed across the year (i.e. that the same number of children are born in every month of the year). However we know that this is not true and we want our model to take into account the number of total births in a given month when assessing whether the number of professional players born in that same month are over-represented. One way to do this is to compare the monthly rates for becoming a professional athlete rather than comparing the number of professional athletes. We can accomplish this by using an offset term in our model. Note for a Poisson regression model for counts we have $log(\lambda_i) = \alpha + \beta y_i$. However if we want a Poisson regression model for rates we can use $log(\frac{\lambda_i}{\theta_i}) = \alpha + \beta y_i$, where $\theta_i$ is the number of Japanese males born in that month in the years of 1987-1989 (which corresponds to professional male athletes who are 23-25 in the year 2012). This is equivalent to $log(\lambda_i)-log(\theta_i) = \alpha + \beta y_i$ or $\lambda_i=\theta_i \times e^{\alpha + \beta y_i}$ (which is how we see the offset term represented in Ishigami's paper). To put it even more plainly, our rate $\frac{\lambda_i}{\theta_i}$ is exponential. Note that interpreting $\alpha$ and $\beta$ is the same as for a Poisson regression model for counts except we multiply the expected counts by $\theta_i$.
 
-For an initial model to simulate data from, we used the 227 professional J. League players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between the count of players (logged) and relative age (RA). As shown in Figure 1, this linearity assumption seems reasonable.  
+Our initial model from which we simulated data, we used the 227 professional J. League players as reported in the paper. Unfortunately, the author did not provide the data used in the offset term and therefore we sought out data sources which would provide values for $\theta_i$, the monthly number of Japanese males born in 1987-1989. We used birth data by country and year provided by United Nations Statistics Division <!-- http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55 --> and the sex ratio for the year 2015 provided by Statista. <!-- https://www.statista.com/statistics/612108/japan-sex-ratio/ --> This data is reported in Table 1.  Additionally, we treat $RA$ as a continuous variable and check to see if there is a linear relationship between the count of players (logged) and relative age (RA). As shown in Figure 1, this linearity assumption seems reasonable.  
 
 ```{r echo =F, message=F, ref.label= "initial_data"}
 
@@ -59,11 +59,7 @@ For an initial model to simulate data from, we used the 227 professional J. Leag
 
 ## Simulation of Artificial Data
 
-Using the player data in the paper and our estimates for total male births, we fit our model from which to simulate professional players per month. Our JAGS model generates a posterior distribution for the $\alpha$ and $\beta$ coefficients. First, we throw away half of our iterations as burn in and we are left with 12,000. Of these we drew 1,000 $\alpha$s and $\beta$s for each month $i$. We then randomly sampled one $\alpha$ and one $\beta$ from which we derived $\lambda_i$ using the link function below: 
-
-$$\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$$
-
-Using this $\lambda_i$ value, we randomly sampled a $y_i$ from the `rpois` function in R. 
+Using the player data in the paper and our estimates for total male births, we fit our model from which to simulate professional players per month. Our JAGS model generates a posterior distribution for the $\alpha$ and $\beta$ coefficients. First, we throw away half of our iterations as burn in and we are left with 12,000. Of these we drew 1,000 $\alpha$ and 1,000 $\beta$ for each month $i$. We then randomly sampled one $\alpha$ and one $\beta$. Using these values we derived $\lambda_i$ with the link function $\lambda_{i} = \theta_{i}\text{exp}\Big(\alpha + \beta RA_i \Big)$. With these 12 $\lambda$ values, we randomly sampled a $y_i$ using the `rpois` function in \textsf{R}.
 
 As reported in Table 2, the simulated players for each month seems reasonable, although we do see some variation between the player data reported in the paper and our simulated values. In Figure 2, we visualize the simulated count of players (logged) and relative age (RA), and see an even more linear relationship than in Figure 1 as we would expect. Note that the simulated data appears more disperse for January through March. 
 
@@ -104,21 +100,25 @@ In our JAGS model, we kept track of the posterior predicted values for $y_i$, us
 
 ```
 
-Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. 
+Since we cannot directly assess the magnitude of the RAE using our simulated $y_i$'s from the Poisson regression model, we report the disadvantage ratio and relative risk. To calculate these RAE sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. 
 
-The mean and 95% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since being born in April is the most advantageous month for becoming a professional athlete and March is the least, all months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. We found a 95% posterior probability that the mean disadvantage of being born in March relative to April for Japanese J. League players in 2012 is between 18.5% and 81.0%. 
+The mean and 95\% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since being born in April is the most advantageous month for becoming a professional athlete and March is the least, all months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. We found a 95% posterior probability that the mean disadvantage of being born in March relative to April for Japanese J. League players in 2012 is between 18.5% and 81.0%. 
 
 The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July.  We also found a 95% posterior probability that the mean relative risk of being born in April is between 1.2 and 5.3 times more likely relative to March to become a professional player. Using the hierarchical Poisson model in the original paper, Ishigami found a 95% posterior probability of 44 and 78 for disadvantage and 1.72 and 4.29 for relative risk.
 
-```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and Relative Risk by Month", fig.height=6, fig.width=8}
+```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and relative risk by month", fig.height=5}
 
 ```
+<!-- fig.height=6, fig.width=8 -->
+\newpage
 
 # Conclusions
 
-The original paper found there was a relationship between the time born in the school year and the probability of becoming a J League soccer player in Japan. We estimated the number of professional players born in each month from a graph in the original paper since the data were not available. We found data on the proportion of births in each month from the UN that should be similar to the data the author used in their paper. Except for adjusting for the prefecture and therefore getting a hierarchical model, we used the same modeling assumptions that the author did and generated a distribution of parameters $\alpha$ and $\beta$ to use to create simulated data. Using the simulated data, we could reproduce the work the author did. 
+The original paper found a significant relationship between month of birth and probability of becoming a J. League soccer player in Japan for 23-25 year olds in 2012 who were playing soccer. We followed a similar methodology, but estimated the number of professional players born in each month from a graph in the original paper given the data were not available. Similarly due to unavailable data, we sourced the number of births for males born in 1987-1989 from published United Nations data. Our modeling assumptions mirror those of the author to generate a distribution of parameters $\alpha$ and $\beta$ which was used to create simulated data. Using the simulated data, we reproduced the work the author did. Although we forewent a hierarchical model, the original paper also allowed for random effects by prefecture as well as prefecture level covariates `population` and `weather.`
 
-In considering the scope of inference of our findings as well as the findings in the original paper, we want to break down the question of scope into a number of dimensions: temporal, sport-type, and geographical. Given what we understand about the data generation process, we feel confident that there is some temporal generalizability. Specifically we expect that professional athletes in Japan in the years surrounding 2012 were probably recruited in similar ways. Unfortunately the author did not specify whether he expected this recruitment process to be the same, which would have been helpful in determining the temporal scope of inference. In terms of sport type, since the authors found differences in the RAE between baseball and soccer, it is not clear how readily this analysis would apply to other sports. The authors describe one of their initial aims as expanding the research of RAEs from only Western countries to Japan. Although we cannot say that the magnitude of the RAE would be the same for other countries, the author has provided evidence that future researchers could use in doing analyses in other Asian countries or other areas of the world. In general, anyone attempting to use these results in their own analysis should consider what the birthday cut-offs are in their given geographical area since it differs by country (ex: it is January for Canadian students, September in America, April in Japan, etc). 
+Using this methodology we also found that the birth month of a professional soccer player born between 1987 and 1989 were associated with their probability of becoming a professional. For example in the case of relative risk (as seen in Figure 6) we see a number of our credible intervals do not overlap with 1 (up to July or August). Similarly a number of our credible intervals for disadvantage do not overlap with 0 (October onwards). In general looking at the consistent shift from month to month we have strong evidence that a birth in April (or soon after April) increases your probability of becoming a professional soccer player in Japan.
+
+In considering the scope of inference of our findings as well as the findings in the original paper, we want to break down the question of "scope" into a number of dimensions: temporal, sport-type, and geographical. Given what we understand about the data generation process, we feel confident that there is some temporal generalizability. Specifically we expect that professional athletes in Japan in the years surrounding 2012 were probably recruited in similar ways. Unfortunately the author did not specify whether he expected this recruitment process to be the same for any given number of years, which would have been helpful in determining the temporal scope of inference. In terms of sport type, since the authors found differences in the RAE between baseball and soccer, it is not clear how readily this analysis would apply to other sports. In terms of geographical scope, the authors describe one of their initial aims as expanding the research of RAEs from only Western countries to Asia. Although we cannot say that the magnitude of the RAE would be the same for all Asian countries, the author has provided evidence future researchers can use in analyzing other Asian countries, or other areas of the world. In general, anyone attempting to use these results in their own analysis should consider what the birthday cut-offs are in their given geographical area since it differs by country (ex: it is January for Canadian students, September in America, April in Japan, etc). 
 
 # Reflection of Data Analysis in Paper and What We Learned
 
@@ -141,6 +141,11 @@ Geweke, J. (1992). _Evaluating the accuracy of sampling-based approaches to calc
 Plummer, M. (2012). _Just another Gibbs sampler (ver. 3.4.0)._ Retrieved from http://mcmc-jags.sourceforge.net/
 
 Stan Development Team. (2013). _Stan: A C++ library for probability and sampling (ver. 1.3.0)._ Retrieved from http://mc-stan.org/
+
+Statista. _Number of males per 100 females in Japan from 1955 to 2035._ Accessed on Dec 15, 2021. https://www.statista.com/statistics/612108/japan-sex-ratio/
+
+United Nations Statistics Division. _Live Births by Month of Birth._ Accessed on Dec 15, 2021. http://data.un.org/Data.aspx?d=POP&f=tableCode%3A55
+
 
 \newpage
 
@@ -209,7 +214,8 @@ jags_out_pre <- rjags::jags.model("jags_model.txt",
                            data = data_jags, 
                            n.adapt=1000, n.chains = 5,
                            inits = list(.RNG.name = "base::Wichmann-Hill",
-                                        .RNG.seed = 1))
+                                        .RNG.seed = 1),
+                           quiet=T)
 
 jags_out <- coda.samples(jags_out_pre, pars_to_save,
                          n.iter = 25000, thin = 1)
@@ -265,7 +271,8 @@ data_jags_sim <- list(y = sim_players, RA = RA, births=births)
 pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
 jags_out_pre_sim <- jags.model("jags_model.txt",
                            data = data_jags_sim ,
-                           n.adapt=1000, n.chains = 5
+                           n.adapt=1000, n.chains = 5,
+                           quiet=T
                            # ,
                            # inits = list(.RNG.name = "base::Wichmann-Hill",
                            #              .RNG.seed = 1)
@@ -279,7 +286,8 @@ data_jags_sim <- list(y = sim_players, RA = RA, births=births)
 pars_to_save_sim <- c("alpha","beta","lambda","y_ppd")
 jags_out_pre_sim <- jags.model("jags_model.txt",
                            data = data_jags_sim ,
-                           n.adapt=1000, n.chains = 5
+                           n.adapt=1000, n.chains = 5,
+                           quiet=T
                            # ,
                            # inits = list(.RNG.name = "base::Wichmann-Hill",
                            #              .RNG.seed = 1)
