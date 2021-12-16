@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The Relative Age Effect (RAE) is a term used to describe how those born early in the academic year tend to have an advantage both athletically and academically. An earlier birth is typically associated with increased physical ability and this advantage may occur because those who are older are typically more physically, emotionally or cognitively developed than those who are younger. Much research has been done to look at RAE in North American and European athletes. However very little research has attempted to extend findings surrounding RAE to other parts of the world, specifically Asia. In this paper, we attempt to replicate the work done in Hideaki Ishigami's paper *Relative age and birthplace effect in Japanese professional sports: a quantitative evaluation using a Bayesian hierarchical Poisson model* (published in the Journal of Sports Sciences in 2016). Note when we are using the term "Relative Age Effect" or RAE, we are simply using terminology established in the literature to describe this phenomenon even though our analysis is establishing association and not necessarily correlation
 
-Our simulation and modeling process will simplify the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and focusing on players between the ages of 23 and 25. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the Poisson model can be found below. The authors then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
+Our simulation and modeling process will simplify the author's study design in which he uses data sourced from the Japan Professional Football League (J. League) from the 2012 soccer season. The J. League data consist of 40 teams, representing a total of 1013 players registered in the 2012 season and focusing on players between the ages of 23 and 25. The author characterized "becoming a professional sports player" as an event and thus we are dealing with discrete count data. Using a poisson regression model it is possible to estimate the magnitude of the RAE on the likelihood of becoming a professional athlete. More details on the Poisson model can be found below. The author then ran an MCMC algorithm \footnote{The MCMC ran for 25,000 iterations with five chains where the first 5,000 samples were discarded as burn-in. Only every 100 iteration was saved for a total of 1,000 MCMC samples.} using JAGS (Plummer, 2012) and confirming with Stan (Stan Development Team, 2013).
 
 The work replicated in our paper is an important step in extending the RAE's scope of inference. Additionally this paper and our analyses allow the magnitude of relative age to be quantified. In contrast, many other analyses have simply stated whether an association is statistically significant using, for example, a $\chi^2$ test. Finally this paper also includes an offset term in our model to capture the differences in birth rates by month which has also often been left out in other analyses. All of these factors make this topic and methodology valuable in the literature on RAE. 
 
@@ -96,16 +96,14 @@ As suggested in Gelman et. al., we chose a burn in of 12,000, with model diagnos
 
 # Posterior Predictive Check and Model Assessment
 
-In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior generated values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to ensure that our model can accurately capture the simulated data. We noted unusual simulated data points, in relation to the player data reported in the paper, but it appears that our simplified model realistically capture these features and find no need for modification. 
+In our JAGS model, we kept track of the posterior predicted values for $y_i$, using the posterior generated values of $\lambda_i$. In Figure 5, we report a posterior predictive check, to ensure that our model can accurately capture the simulated data. We noted unusual simulated data points, in relation to the player data reported in the paper, but it appears that our simplified model realistically capture these features and find no need for modification. We confirmed these results using Stan. 
 
 ```{r echo =F, message=F, ref.label= "post_predict", fig.cap="Posterior Prediction for Players per month", fig.height=6, fig.width=8}
 
 ```
 
 
-Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. The mean and 95% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since April is the most likely month for a professional player to be born<!--  (most advantageous?)--> and March is the least likely, all other months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July. 
-
-<!-- Model assumptions! --> 
+Since we cannot directly assess the effect sizes from the parameter estimate of $y_i$ generated from our Poisson regression model, we report the magnitude of these effects using the disadvantage ratio and relative risk. To calculate these effect sizes, we found the probability, $p_i$, of becoming a professional J. League player by dividing the posterior generated $y_i$'s by the total number of male births in month $i$. Letting $p_{i}$ be the probability of becoming a professional player in month $i$ and $p_{i+1}$, the probability of becoming a professional athlete in the next month, the disadvantage is calculated as $(p_i - p_{i+1}/p_i)$ and relative risk is calculated as $p_i/p{i+1}$. 
 
 ```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and Relative Risk by Month", fig.height=6, fig.width=8}
 
@@ -113,9 +111,13 @@ Since we cannot directly assess the effect sizes from the parameter estimate of 
 
 # Conclusions
 
-The original paper found there was a relationship between the time born in the school year and the probability of becoming a J League soccer player in Japan. We estimated the number of professional players born in each month from a graph in the original paper since the data were not available. We found data on the proportion of births in each month from the UN that should be similar to the data the authors used in their paper. Except for adjusting for the prefecture, we used the same modeling assumptions that the authors did and generated a distribution of parameters $\alpha$ and $\beta$ to use to create simulated data. Using the simulated data, we could reproduce the work the author did. 
+The original paper found there was a relationship between the time born in the school year and the probability of becoming a J League soccer player in Japan. We estimated the number of professional players born in each month from a graph in the original paper since the data were not available. We found data on the proportion of births in each month from the UN that should be similar to the data the author used in their paper. Except for adjusting for the prefecture and therefore getting a hierarchical model, we used the same modeling assumptions that the author did and generated a distribution of parameters $\alpha$ and $\beta$ to use to create simulated data. Using the simulated data, we could reproduce the work the author did. 
 
-<!-- Even thought our linear assumption is can get reasonably close values, the log linear relationship between number of players and month could be examined further--> 
+The mean and 95% uncertainty interval for the disadvantage of each month relative to April and for the relative risk of each month compared to March in the simulated data is shown in Figure 6. Since being born in April is the most advantageous month for becoming a professional athlete and March is the least, all months after April have a positive relationship with the disadvantage, but November is the first month that had a 95% uncertainty interval that was exclusively greater than 0. The relative risk of each month decreases from April to February. We found a 95% posterior probability that the mean disadvantage of being born in March relative to April for Japanese J. League players in 2012 is between 18.5% and 81.0%. 
+
+The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July.  We also found a 95% posterior probability that the mean relative risk of being born in April is between 1.2 and 5.3 times more likely relative to March to become a professional player. Using the hierarchical poisson model in the original paper, Ishigami found a 95% posterior probability of 44 and 78 for disadvantage and 1.72 and 4.29 for relative risk.
+
+In considering the scope of inference of our findings as well as the findings in the original paper, we want to break down the question of scope into a number of dimensions: temporal, sport-type, and geographical. Given what we understand about the data generation process, we feel confident that there is some temporal generalizability. Specifically we expect that professional athletes in Japan in the years surrounding 2012 were probably recruited in similar ways. Unfortunately the author did not specify whether he expected this recruitment process to be the same, which would have been helpful in determining the temporal scope of inference. In terms of sport type, since the authors found differences in the RAE between baseball and soccer, it is not clear how readily this analysis would apply to other sports. The authors describe one of their initial aims as expanding the research of RAEs from only Western countries to Japan. Although we cannot say that the magnitude of the RAE would be the same for other countries, the author has provided evidence that future researchers could use in doing analyses in other Asian countries or other areas of the world. In general, anyone attempting to use these results in their own analysis should consider what the birthday cut-offs are in their given geographical area since it differs by country (ex: it is January for Canadian students, September in America, April in Japan, etc). 
 
 \newpage
 
@@ -163,8 +165,8 @@ library(ggplot2)
 ggplot(data = data_df, aes(x=RA, y = log(players))) +
   geom_point() +
   xlab("Relative Age (RA)") +
-  ylab("Count of Players (logged)") +
-  ggtitle("Assessing The Reasonability of Linearity between \n Logged Count of Players and Relative Age") +
+  ylab("Log Count of Players") +
+  ggtitle("Assessing The Reasonability of Linearity between \n Log Count of Players and Relative Age") +
   geom_smooth(method = 'loess', se=FALSE, span=1) + 
   theme(plot.title = element_text(hjust = 0.5))
 
@@ -223,8 +225,8 @@ pander(data_df, caption="Simulated Player Data")
 ggplot(data = data_df, aes(x=RA, y = log(sim_players))) +
   geom_point() +
   xlab("Relative Age (RA)") +
-  ylab("Count of Players (logged)") +
-  ggtitle("Inspecting Simulated Data for \n Logged Count of Players and their Relative Age") +
+  ylab("Log Count of Players") +
+  ggtitle("Inspecting Simulated Data for \n Log Count of Players and their Relative Age") +
   geom_smooth(method = 'loess', se=FALSE, span = 1) + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -304,7 +306,7 @@ plot_samps_jags <- data.frame(all_samps_jags[idx_samp_jags, ])
 #Function for posterior prediction
 post_predict <- function(samples, length, data, label){
 plot(table(samples)/length, 
-     main = paste0("Post Predic ", label),
+     main = paste("Post Predic", label),
      type = "h", ylab = "Density", 
      xlab = "y",
      col = rgb(0.1,0.1,0.1, 0.2))
