@@ -112,7 +112,9 @@ Since we cannot directly assess the effect sizes from the parameter estimate of 
 
 # Conclusions
 
+The original paper found there was a relationship between the time born in the school year and the probability of becoming a J League soccer player in Japan. We estimated the number of professional players born in each month from a graph in the original paper since the data were not available. We found data on the proportion of births in each month from the UN that should be similar to the data the authors used in their paper. Except for adjusting for the prefecture, we used the same modeling assumptions that the authors did and generated a distribution of parameters $\alpha$ and $\beta$ to use to create simulated data. Using the simulated data, we could reproduce the work the author did. 
 
+<!-- Even thought our linear assumption is can get reasonably close values, the log linear relationship between number of players and month could be examined further--> 
 
 
 
