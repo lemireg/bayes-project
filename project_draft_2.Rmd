@@ -106,7 +106,7 @@ The mean and 95\% uncertainty interval for the disadvantage of each month relati
 
 The relative risk in this context could be interpreted for each month as the relative risk times more likely than March to produce a professional soccer player in the J League. The last month to have a 95% uncertainty interval that was strictly greater than 1 for the relative risk is July.  We also found a 95% posterior probability that the mean relative risk of being born in April is between 1.2 and 5.3 times more likely relative to March to become a professional player. Using the hierarchical Poisson model in the original paper, Ishigami found a 95% posterior probability of 44 and 78 for disadvantage and 1.72 and 4.29 for relative risk.
 
-```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and relative risk by month", fig.height=5}
+```{r echo =F, message=F, ref.label= "Dis_RR_visual", fig.cap="Disadvantage and relative risk by month", fig.height=4.8}
 
 ```
 <!-- fig.height=6, fig.width=8 -->
@@ -482,3 +482,61 @@ rr_plot <- df %>%
 grid.arrange(dis_plot, rr_plot, ncol=1)
 ```
 
+```{r eval=F}
+# --- JAGS MODEL
+model{
+    ## Likelihood
+    for(i in 1:length(RA)){
+      y[i] ~ dpois(lambda[i])
+      lambda[i] <- births[i]*exp(alpha + RA[i]*beta)
+      }     
+    ## Priors
+    #alpha
+    mu_a ~ dnorm(0,100*100)
+    sig_a ~ dunif(0,100)
+    alpha ~ dnorm(mu_a, sig_a*sig_a)
+    
+    #beta
+    mu ~ dnorm(0,100*100)
+    sig ~ dt(0, pow(2.5,-2), 5)T(0,)
+    beta ~ dnorm(mu,sig*sig)
+    
+    #Posterior Predict Players
+    for(i in 1:12) {
+      y_ppd[i] ~ dpois(lambda[i])
+    }
+}
+```
+
+```{r eval=F}
+# ---STAN CODE
+data {
+  int<lower = 0> I;
+  int<lower = 0> y[I];  
+  real<lower = 0> births[I];
+  int<lower = 0> RA[I];
+}
+
+parameters {
+  real alpha;
+  real beta;
+  // real<lower=0, upper = 100> sigma_a;
+  // real<lower=0> sigma_b;
+}
+
+transformed parameters {
+  real<lower=0> lambda[I];
+  for (i in 1:I)
+  lambda[i] = births[i]*exp(alpha+beta*RA[i]);
+  }
+
+model {
+    alpha ~ normal(0, 1000);
+    beta ~ normal(0, 1000);
+    // sigma_a ~ uniform(0, 100);
+    // sigma_b ~ cauchy(0,1);
+        for (i in 1:I){
+    y[i] ~ poisson(lambda[i]);
+    }
+}
+```
