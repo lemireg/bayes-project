@@ -64,6 +64,8 @@ Katie's comment about this:
 
 Given our likelihood and prior our full model can be expressed as follows:
 
+
+
 $$P(\lambda_i|\vec{y}) \propto \prod_{i=0}^{11} e^{-\lambda}\frac{\lambda^{y_i}}{y_i!} \times \theta_{i}e^{(\alpha +\beta RA_i)}$$
 
 Look into whether our posterior is Gamma, and if this is even our posterior of interest: https://stats.stackexchange.com/questions/26199/how-do-i-calculate-a-posterior-distribution-for-a-poisson-model-with-exponential
